@@ -1,30 +1,48 @@
 import React from 'react';
 import { Table } from 'antd';
-import { Breadcrumb, Alert } from 'antd';
+import { Breadcrumb, Alert, Popconfirm } from 'antd';
 import { HomeOutlined, UserOutlined } from '@ant-design/icons';
-
+import HomeContentButton from './HomeContent/HomeContentButton';
 const columns = [
+	{
+		title: 'Type',
+		dataIndex: 'type',
+	},
 	{
 		title: 'Name',
 		dataIndex: 'name',
 	},
 	{
-		title: 'Age',
-		dataIndex: 'age',
+		title: 'Kích thước',
+		dataIndex: 'size',
 	},
 	{
-		title: 'Address',
-		dataIndex: 'address',
+		title: 'Sửa đổi lần cuối',
+		dataIndex: 'modifyTime',
+	},
+	{
+		title: '',
+		dataIndex: 'operation',
+		render: (text, record) => (
+			<Popconfirm
+				title="Sure to delete?"
+				onConfirm={() => console.log(record.key)}
+				// this.handleDelete(record.key)
+			>
+				<a>Delete</a>
+			</Popconfirm>
+		),
 	},
 ];
 
 const data = [];
-for (let i = 0; i < 46; i++) {
+for (let i = 0; i < 20; i++) {
 	data.push({
 		key: i,
-		name: `Edward King ${i}`,
-		age: 32,
-		address: `London, Park Lane no. ${i}`,
+		type: `Edward King ${i}`,
+		name: 32,
+		size: `London, Park Lane no. ${i}`,
+		modifyTime: 10,
 	});
 }
 
@@ -90,7 +108,7 @@ class HomeContent extends React.Component {
 		};
 		return (
 			<>
-				<div style={{ margin: '2rem' }}>
+				<div style={{ margin: '3rem 2rem 0 0' }}>
 					<Breadcrumb>
 						<Breadcrumb.Item href="">
 							<HomeOutlined />
@@ -101,6 +119,10 @@ class HomeContent extends React.Component {
 						</Breadcrumb.Item>
 						<Breadcrumb.Item>Application</Breadcrumb.Item>
 					</Breadcrumb>
+					<hr></hr>
+				</div>
+				<div>
+					<HomeContentButton />
 				</div>
 				<div>
 					<Table
