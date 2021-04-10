@@ -5,7 +5,7 @@ import musicReducer from './musicReducer'
 import userReducer from './userReducer'
 
 const rootReducer = combineReducers({
-    users: userReducer,
+    auth: userReducer,
     images:imageReducer,
     audios:audioReducer,
     musics:musicReducer

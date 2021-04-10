@@ -3,8 +3,6 @@ import { Menu, Button, Popover, Dropdown } from 'antd';
 import { Link } from 'react-router-dom';
 import avatarDefault from '../../../images/googleLogo.png';
 import avatar from '../../../images/googleDrive.png';
-import { connect } from 'react-redux';
-// import { logout } from '../../../pages/signin/actions';
 import './Style.css';
 import { message } from 'antd';
 import {
@@ -13,18 +11,11 @@ import {
 	LogoutOutlined,
 	DownOutlined,
 } from '@ant-design/icons';
-// import Signin from '../../../pages/signin/Signin';
-function logout() {
-	window.location.reload();
-}
 
-function handleMenuClick(e) {
-	message.info('Click on menu item.');
-	console.log('click', e);
-}
+
+
 const content = (
 	<div className="avatar-group-button-user">
-		<Link to="/profile">
 			<div>
 				<img
 					src={avatar}
@@ -36,9 +27,8 @@ const content = (
 					}}
 				/>
 			</div>
-		</Link>
 		<hr />
-		<Menu onClick={handleMenuClick}>
+		<Menu >
 			<Menu.Item key="1" icon={<UserOutlined />}>
 				1st menu item
 			</Menu.Item>
@@ -56,7 +46,7 @@ const content = (
 			shape="round"
 			icon={<LogoutOutlined />}
 			size={'middle'}
-			onClick={logout}
+			
 		>
 			Đăng xuất
 		</Button>
@@ -67,10 +57,10 @@ const menu = (
 	<div className="avatar-group-notifi-detail">
 		<Menu>
 			<Menu.Item key="0">
-				<div>Sơn Tùng MTP</div>
+				<div>1</div>
 			</Menu.Item>
 			<Menu.Item key="1">
-				<div>Mr Siro vừa ra bài hát mới</div>
+				<div>2</div>
 			</Menu.Item>
 		</Menu>
 	</div>
@@ -108,13 +98,5 @@ export class AvatarGroup extends Component {
 		);
 	}
 }
-// const mapStateToProps = (state) => ({
-// 	data: state.reducerLogin.data,
-// 	userToken: state.reducerLogin.userToken,
-// 	loading: state.reducerLogin.loading,
-// 	error: state.reducerLogin.error,
-// 	authenticated: state.reducerLogin.authenticated,
-// });
-// const mapDispatchToProps = {};
-// export default connect(mapStateToProps, mapDispatchToProps)(AvatarGroup);
+
 export default AvatarGroup;

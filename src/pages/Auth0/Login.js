@@ -1,12 +1,15 @@
 import React, { useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
-
+import './auth.css';
 import Form from "react-validation/build/form";
 import Input from "react-validation/build/input";
 import CheckButton from "react-validation/build/button";
-
-import { login } from "../actions/auth";
+import { Button, Col, Layout, Menu, Row } from "antd";
+import { Link } from "react-router-dom";
+import logo from "../../images/logo micro.png";
+const { Header, Content, Footer } = Layout;
+// import { login } from "../actions/auth";
 
 const required = (value) => {
   if (!value) {
@@ -25,8 +28,8 @@ const Login = (props) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { isLoggedIn } = useSelector((state) => state.auth);
-  const { message } = useSelector((state) => state.message);
+  // const { isLoggedIn } = useSelector((state) => state.auth);
+  // const { message } = useSelector((state) => state.message);
 
   const dispatch = useDispatch();
 
@@ -40,29 +43,57 @@ const Login = (props) => {
   };
   const handleLogin = (e) => {
     e.preventDefault();
+    
+    // setLoading(true);
 
-    setLoading(true);
+    // form.current.validateAll();
 
-    form.current.validateAll();
-
-    if (checkBtn.current.context._errors.length === 0) {
-      dispatch(login(username, password))
-        .then(() => {
-          props.history.push("/profile");
-          window.location.reload();
-        })
-        .catch(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
+    // if (checkBtn.current.context._errors.length === 0) {
+    //   dispatch(login(username, password))
+    //     .then(() => {
+    //       props.history.push("/profile");
+    //       window.location.reload();
+    //     })
+    //     .catch(() => {
+    //       setLoading(false);
+    //     });
+    // } else {
+    //   setLoading(false);
+    // }
   };
-  if (isLoggedIn) {
-    return <Redirect to="/profile" />;
-  }
+  // if (isLoggedIn) {
+  //   return <Redirect to="/profile" />;
+  // }
   return (
-    <div className="col-md-12">
+    <Layout>
+    <Header style={{ position: "fixed", zIndex: 1, width: "100%" }}>
+      <img
+        src={logo}
+        style={{
+          width: "130px",
+          padding: "0.3rem 0 0 1rem",
+        }}
+        alt="#"
+      />
+      <Menu
+        theme="dark"
+        mode="horizontal"
+        style={{ float: "right", fontSize: 15 }}
+      >  
+        <Menu.Item >Liên hệ</Menu.Item>
+       <Menu.Item > <Link to='/register'>Đăng ký</Link></Menu.Item>
+        <Menu.Item > <Link to="/login">Đăng nhập</Link></Menu.Item>
+      </Menu>
+    </Header>
+    <Content
+      className="site-layout"
+      style={{ padding: "0 0px", marginTop: 64 }}
+    >
+      <div
+        className="site-layout-background"
+        style={{ padding: 24, minHeight: 380 }}
+      >
+        <div className="col-md-12">
       <div className="card card-container">
         <img
           src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
@@ -70,7 +101,9 @@ const Login = (props) => {
           className="profile-img-card"
         />
 
-        <Form onSubmit={handleLogin} ref={form}>
+        <Form 
+        onSubmit={handleLogin}
+         ref={form}>
           <div className="form-group">
             <label htmlFor="username">Username</label>
             <Input
@@ -102,17 +135,24 @@ const Login = (props) => {
             </button>
           </div>
 
-          {message && (
+          {/* {message && (
             <div className="form-group">
               <div className="alert alert-danger" role="alert">
                 {message}
               </div>
             </div>
-          )}
+          )} */}
           <CheckButton style={{ display: "none" }} ref={checkBtn} />
         </Form>
       </div>
     </div>
+      </div>
+    </Content>
+    <Footer style={{ textAlign: "center" }}>
+      Ant Design ©2018 Created by Ant UED
+    </Footer>
+  </Layout>
+   
   );
 };
 export default Login;

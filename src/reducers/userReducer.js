@@ -5,10 +5,11 @@ import {
   LOGIN_FAIL,
   LOGOUT,
 } from "../actions/type";
-const initialState = user
+const user = []
+const initialState = user 
   ? { isLoggedIn: true, user }
   : { isLoggedIn: false, user: null };
-const user = JSON.parse(localStorage.getItem("user"));
+// const user = JSON.parse(localStorage.getItem("user"));
 const userReducer = (state = initialState, action) => {
   const { type, payload } = action;
 
