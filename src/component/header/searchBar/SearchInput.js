@@ -21,7 +21,8 @@ const searchResult = (query) => {
 						}}
 					>
 						<span>
-							Bài hát {query}
+							
+							vãi lúa {query}
 							<a
 								href={`http://localhost:8081/songName?title=${query}`}
 								target="_blank"

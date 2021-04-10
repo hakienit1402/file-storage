@@ -1,4 +1,4 @@
-const imageReducer = (state, action) => {
+const imageReducer = (state= { images: [] }, action) => {
     switch (action.type) {
       case "ADD_IMAGE":
         return state;

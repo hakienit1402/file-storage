@@ -1,4 +1,4 @@
-const audioReducer = (state, action) => {
+const audioReducer = (state={audios:[]}, action) => {
     switch (action.type) {
       case "ADD_AUDIO":
         return state;

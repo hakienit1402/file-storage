@@ -2,7 +2,7 @@ import React from 'react';
 import { Table } from 'antd';
 import { Breadcrumb, Alert, Popconfirm } from 'antd';
 import { HomeOutlined, UserOutlined } from '@ant-design/icons';
-import HomeContentButton from './HomeContent/HomeContentButton';
+import HomeContentButton from './HomeContentButton';
 const columns = [
 	{
 		title: 'Type',
