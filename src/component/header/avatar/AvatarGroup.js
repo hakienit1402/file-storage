@@ -12,23 +12,21 @@ import {
 	DownOutlined,
 } from '@ant-design/icons';
 
-
-
 const content = (
 	<div className="avatar-group-button-user">
-			<div>
-				<img
-					src={avatar}
-					alt="my image"
-					style={{
-						marginTop: '1rem',
-						width: 50,
-						cursor: 'pointer',
-					}}
-				/>
-			</div>
+		<div>
+			<img
+				src={avatar}
+				alt="my image"
+				style={{
+					marginTop: '1rem',
+					width: 50,
+					cursor: 'pointer',
+				}}
+			/>
+		</div>
 		<hr />
-		<Menu >
+		<Menu>
 			<Menu.Item key="1" icon={<UserOutlined />}>
 				1st menu item
 			</Menu.Item>
@@ -46,7 +44,6 @@ const content = (
 			shape="round"
 			icon={<LogoutOutlined />}
 			size={'middle'}
-			
 		>
 			Đăng xuất
 		</Button>
@@ -74,7 +71,11 @@ export class AvatarGroup extends Component {
 					marginTop: '1rem',
 				}}
 			>
-				<Dropdown overlay={menu} trigger={['click']}>
+				<Dropdown
+					overlay={menu}
+					placement="bottomCenter"
+					trigger={['click']}
+				>
 					<Button
 						shape="circle"
 						icon={<BellOutlined />}
