@@ -1,8 +1,10 @@
 import React from 'react';
 import { Table } from 'antd';
 import { Breadcrumb, Alert, Popconfirm } from 'antd';
-import { HomeOutlined, UserOutlined } from '@ant-design/icons';
+
 import HomeContentButton from './HomeContentButton';
+import NavigationTab from './NavigationTab';
+
 const columns = [
 	{
 		title: 'Type',
@@ -49,6 +51,7 @@ for (let i = 0; i < 20; i++) {
 class HomeContent extends React.Component {
 	state = {
 		selectedRowKeys: [], // Check here to configure the default column
+		active: this.props.active,
 	};
 
 	onSelectChange = (selectedRowKeys) => {
@@ -58,6 +61,7 @@ class HomeContent extends React.Component {
 
 	render() {
 		const { selectedRowKeys } = this.state;
+		console.log(this.props.active + ' content');
 		const rowSelection = {
 			selectedRowKeys,
 			onChange: this.onSelectChange,
@@ -109,17 +113,7 @@ class HomeContent extends React.Component {
 		return (
 			<>
 				<div style={{ margin: '3rem 2rem 0 0' }}>
-					<Breadcrumb>
-						<Breadcrumb.Item href="">
-							<HomeOutlined />
-						</Breadcrumb.Item>
-						<Breadcrumb.Item href="">
-							<UserOutlined />
-							<span>Application List</span>
-						</Breadcrumb.Item>
-						<Breadcrumb.Item>Application</Breadcrumb.Item>
-					</Breadcrumb>
-					<hr></hr>
+					<NavigationTab />
 				</div>
 				<div>
 					<HomeContentButton />
