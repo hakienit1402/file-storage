@@ -12,16 +12,16 @@ const { Search } = Input;
 
 const MainPage = (props) => {
 	const [active, setActive] = useState(1);
-	 const listMusics = useSelector(state => state)
+	 const listMusics = useSelector(state => state.musics)
 	 const {loading,error,musics}= listMusics
 	 const dispatch = useDispatch();
 	const clickHandler = (event) => {
 		setActive(event.key);
 	};
 	//getdata
-	// useEffect(() => {
-	// dispatch(getListMusics())
-	// }, [])
+	useEffect(() => {
+	dispatch(getListMusics())
+	}, [])
 	// console.log(musics)
 	return (
 		<div>
@@ -37,7 +37,7 @@ const MainPage = (props) => {
 							background: '#fff',
 						}}
 					>
-						<HomeContent active={active} />
+						<HomeContent active={active}/>
 					</Layout>
 				</Layout>
 			</Layout>
