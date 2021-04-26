@@ -4,25 +4,17 @@ import { UserOutlined, PictureOutlined } from '@ant-design/icons';
 import Slider from '../../component/slider/Slider';
 import HomeContent from '../../component/home/HomeContent/HomeContent';
 import Header from '../../component/header/Header';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
-import getListMusics from "../../actions/musicAction"
+
 const { Sider } = Layout;
 const { Search } = Input;
 
 const MainPage = (props) => {
 	const [active, setActive] = useState(1);
-	 const listMusics = useSelector(state => state.musics)
-	 const {loading,error,musics}= listMusics
-	 const dispatch = useDispatch();
+
 	const clickHandler = (event) => {
 		setActive(event.key);
 	};
-	//getdata
-	useEffect(() => {
-	dispatch(getListMusics())
-	}, [])
-	// console.log(musics)
+
 	return (
 		<div>
 			<Layout>
@@ -37,7 +29,7 @@ const MainPage = (props) => {
 							background: '#fff',
 						}}
 					>
-						<HomeContent active={active}/>
+						<HomeContent active={active} />
 					</Layout>
 				</Layout>
 			</Layout>
