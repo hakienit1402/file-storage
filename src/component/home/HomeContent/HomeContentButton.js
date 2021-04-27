@@ -6,19 +6,22 @@ import {
 	CloseCircleFilled,
 	SwapOutlined,
 } from '@ant-design/icons';
+import { useDispatch } from 'react-redux';
 const { Header, Sider } = Layout;
 const { Search } = Input;
 
 const HomeContentButton = (props) => {
+	
 	const selectedRowKeys = props.selectedRowKeys;
-
-	useEffect(() => {
-		deleteMusicItem(selectedRowKeys);
-	}, [selectedRowKeys]);
+ 	const dispatch = useDispatch()
+	// useEffect(() => {
+	// 	deleteMusicItem(selectedRowKeys);
+	// }, [selectedRowKeys]);
 
 	const handleDelete = (e) => {
-		console.log('selectedRowKeys changed: ' + selectedRowKeys);
-		deleteMusicItem();
+		// console.log('selectedRowKeys changed: ' + selectedRowKeys);
+		// deleteMusicItem();
+		dispatch(deleteMusicItem(selectedRowKeys))
 	};
 	return (
 		<div>
