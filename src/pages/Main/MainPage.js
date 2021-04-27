@@ -1,18 +1,18 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
-import { Layout, Menu, Breadcrumb, Input, Avatar } from 'antd';
-import { UserOutlined, PictureOutlined } from '@ant-design/icons';
-import Slider from '../../component/slider/Slider';
-import HomeContent from '../../component/home/HomeContent/HomeContent';
+import { Input, Layout } from 'antd';
+import React, { useState } from 'react';
 import Header from '../../component/header/Header';
+import HomeContent from '../../component/home/HomeContent/HomeContent';
+import Slider from '../../component/slider/Slider';
 
 const { Sider } = Layout;
 const { Search } = Input;
 
 const MainPage = (props) => {
 	const [active, setActive] = useState(1);
-
+	const [listBreadcrumb,setListBreadcrumb]= useState(['Home'])
 	const clickHandler = (event) => {
 		setActive(event.key);
+		// console.log(event.key)
 	};
 
 	return (
@@ -29,7 +29,7 @@ const MainPage = (props) => {
 							background: '#fff',
 						}}
 					>
-						<HomeContent active={active} />
+						<HomeContent active={active} listBreadcrumb={listBreadcrumb}/>
 					</Layout>
 				</Layout>
 			</Layout>

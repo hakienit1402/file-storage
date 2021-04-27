@@ -9,11 +9,6 @@ import {
 } from '@ant-design/icons';
 
 const Slider = ({ clickHandler }) => {
-	const audioRef = useRef();
-
-	const handleClick = (e) => {
-		console.log('click ', e);
-	};
 
 	return (
 		<div>
@@ -24,7 +19,7 @@ const Slider = ({ clickHandler }) => {
 					onClick={clickHandler}
 					style={{ width: 256 }}
 					defaultSelectedKeys={['1']}
-					defaultOpenKeys={['sub1']}
+					// defaultOpenKeys={['']}
 					mode="inline"
 				>
 					<Menu.Item key="1">
