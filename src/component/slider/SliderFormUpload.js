@@ -13,11 +13,6 @@ const SliderFormUpload = (props) => {
 					<Button>Upload file</Button>
 				</Upload>
 			</div>
-			<div>
-				<Upload {...props} directory={true}>
-					<Button>Upload directory</Button>
-				</Upload>
-			</div>
 		</>
 	);
 	const showModal = () => {
@@ -37,11 +32,7 @@ const SliderFormUpload = (props) => {
 	return (
 		<div>
 			<div style={{ margin: '3rem 0 1rem 15px' }}>
-				<Popover
-					content={content}
-					placement="bottomLeft"
-					trigger="click"
-				>
+				<Upload {...props}>
 					<Button
 						variant="contained"
 						startIcon={
@@ -50,7 +41,7 @@ const SliderFormUpload = (props) => {
 					>
 						Upload
 					</Button>
-				</Popover>
+				</Upload>
 			</div>
 			<div style={{ margin: '2rem 0 1rem 15px' }}>
 				<Button
