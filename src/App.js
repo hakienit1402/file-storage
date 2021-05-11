@@ -7,6 +7,28 @@ const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
 const MainPage = lazy(() => import('./pages/Main/MainPage'));
 
 const App = () => {
+	
+	// function PrivateRoute({ children, ...rest }) {
+	// 	let user = true;
+	// 	// let auth = useAuth();
+	// 	return (
+	// 	  <Route
+	// 		{...rest}
+	// 		render={({ location }) =>
+	// 		  user ? (
+	// 			children
+	// 		  ) : (
+	// 			<Redirect
+	// 			  to={{
+	// 				pathname: "/login",
+	// 				state: { from: location }
+	// 			  }}
+	// 			/>
+	// 		  )
+	// 		}
+	// 	  />
+	// 	);
+	//   }
 	return (
 		<div>
 			<Router>
@@ -20,6 +42,9 @@ const App = () => {
 							<Route path="/login">
 								<Login />
 							</Route>
+							{/* <PrivateRoute path="/main">
+								<MainPage />
+							</PrivateRoute> */}
 							<Route path="/main">
 								<MainPage />
 							</Route>

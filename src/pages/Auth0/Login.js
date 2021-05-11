@@ -26,10 +26,8 @@ const Login = (props) => {
 
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
-	const [loading, setLoading] = useState(false);
+	// const [loading, setLoading] = useState(false);
 
-	// const { isLoggedIn } = useSelector((state) => state.auth);
-	// const { message } = useSelector((state) => state.message);
 
 	const dispatch = useDispatch();
 
@@ -43,15 +41,15 @@ const Login = (props) => {
 	};
 	const handleLogin = (e) => {
 		e.preventDefault();
-		return <Redirect to="/main" />;
+		// return <Redirect to="/main" />;
 		// setLoading(true);
 
-		// form.current.validateAll();
+		form.current.validateAll();
 
 		// if (checkBtn.current.context._errors.length === 0) {
 		//   dispatch(login(username, password))
 		//     .then(() => {
-		//       props.history.push("/profile");
+		//       props.history.push("/main");
 		//       window.location.reload();
 		//     })
 		//     .catch(() => {
@@ -82,11 +80,9 @@ const Login = (props) => {
 				>
 					<Menu.Item>Liên hệ</Menu.Item>
 					<Menu.Item>
-						{' '}
 						<Link to="/register">Đăng ký</Link>
 					</Menu.Item>
 					<Menu.Item>
-						{' '}
 						<Link to="/login">Đăng nhập</Link>
 					</Menu.Item>
 				</Menu>
@@ -133,11 +129,11 @@ const Login = (props) => {
 								<div className="form-group">
 									<button
 										className="btn btn-primary btn-block"
-										disabled={loading}
+										// disabled={loading}
 									>
-										{loading && (
+										{/* {loading && (
 											<span className="spinner-border spinner-border-sm"></span>
-										)}
+										)} */}
 										<span>Login</span>
 									</button>
 								</div>

@@ -1,47 +1,48 @@
-import {
-  REGISTER_SUCCESS,
-  REGISTER_FAIL,
-  LOGIN_SUCCESS,
-  LOGIN_FAIL,
-  LOGOUT,
-} from "../actions/type";
-const user = []
-const initialState = user 
-  ? { isLoggedIn: true, user }
-  : { isLoggedIn: false, user: null };
-// const user = JSON.parse(localStorage.getItem("user"));
-const userReducer = (state = initialState, action) => {
-  const { type, payload } = action;
+import { LOGIN_FAIL, LOGIN_REQUEST, LOGIN_SUCCESS, REGISTER_FAIL, REGISTER_REQUEST, REGISTER_SUCCESS } from "../constants/authConstants";
 
+const userReducer = (state = {}, action) => {
+  const { type, payload } = action;
   switch (type) {
-    case REGISTER_SUCCESS:
+    case REGISTER_REQUEST:
       return {
         ...state,
-        isLoggedIn: false,
+       
       };
+      case REGISTER_SUCCESS:
+        return {
+          ...state,
+         
+        };
     case REGISTER_FAIL:
       return {
         ...state,
-        isLoggedIn: false,
+       
+      };
+    case LOGIN_REQUEST:
+      return {
+        ...state, 
+        loading:true,
+        
+        // isLoggedIn: true,
+        // user: payload.user,
       };
     case LOGIN_SUCCESS:
       return {
         ...state,
-        isLoggedIn: true,
-        user: payload.user,
+      loading: false, 
+      users: action.payload 
       };
     case LOGIN_FAIL:
       return {
         ...state,
-        isLoggedIn: false,
-        user: null,
+        loading: false, error: action.payload
       };
-    case LOGOUT:
-      return {
-        ...state,
-        isLoggedIn: false,
-        user: null,
-      };
+    // case LOGOUT:
+    //   return {
+    //     ...state,
+    //     isLoggedIn: false,
+    //     user: null,
+    //   };
     default:
       return state;
   }

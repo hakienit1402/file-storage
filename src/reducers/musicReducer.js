@@ -27,8 +27,8 @@ const musicReducer = (
       return { loading: true };
     case UPDATE_STORE_MUSIC_TMP:
       return { loading: false, musics: action.payload };
-	case GET_LIST_MUSIC:
-		return state
+    case GET_LIST_MUSIC:
+      return state;
     case POST_EDIT_MUSIC_SUCCESS:
       return { loading: false, musics: action.payload };
     case POST_EDIT_MUSIC_FAIL:
