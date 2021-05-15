@@ -4,52 +4,27 @@ import { Link } from 'react-router-dom';
 import avatarDefault from '../../../images/googleLogo.png';
 import avatar from '../../../images/googleDrive.png';
 import './Style.css';
-import { message } from 'antd';
+import { logout } from '../../../actions/authAction';
 import {
 	BellOutlined,
 	UserOutlined,
 	LogoutOutlined,
 	DownOutlined,
 } from '@ant-design/icons';
+import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
-const content = (
-	<div className="avatar-group-button-user">
-		<div>
-			<img
-				src={avatar}
-				alt="my image"
-				style={{
-					marginTop: '1rem',
-					width: 50,
-					cursor: 'pointer',
-				}}
-			/>
-		</div>
-		<hr />
-		<Menu>
-			<Menu.Item key="1" icon={<UserOutlined />}>
-				1st menu item
-			</Menu.Item>
-			<Menu.Item key="2" icon={<UserOutlined />}>
-				2nd menu item
-			</Menu.Item>
-			<Menu.Item key="3" icon={<UserOutlined />}>
-				3rd menu item
-			</Menu.Item>
-		</Menu>
-		<hr />
 
-		<Button
-			type="dashed"
-			shape="round"
-			icon={<LogoutOutlined />}
-			size={'middle'}
-		>
-			Đăng xuất
-		</Button>
-	</div>
-);
 
+const AvatarGroup =()=> {
+	const dispatch = useDispatch();
+	const his = useHistory();
+const handleLogout =()=>{
+	dispatch(logout());
+	his.replace('/');
+	// console.log(
+
+}
 const menu = (
 	<div className="avatar-group-notifi-detail">
 		<Menu>
@@ -62,8 +37,45 @@ const menu = (
 		</Menu>
 	</div>
 );
-export class AvatarGroup extends Component {
-	render() {
+	const content = (
+		<div className="avatar-group-button-user">
+			<div>
+				<img
+					src={avatar}
+					alt="my image"
+					style={{
+						marginTop: '1rem',
+						width: 50,
+						cursor: 'pointer',
+					}}
+				/>
+			</div>
+			<hr />
+			<Menu>
+				<Menu.Item key="1" icon={<UserOutlined />}>
+					1st menu item
+					
+				</Menu.Item>
+				<Menu.Item key="2" icon={<UserOutlined />}>
+					2nd menu item
+				</Menu.Item>
+				<Menu.Item key="3" icon={<UserOutlined />}>
+					3rd menu item
+				</Menu.Item>
+			</Menu>
+			<hr />
+	
+			<Button
+				type="dashed"
+				shape="round"
+				icon={<LogoutOutlined />}
+				size={'middle'}
+				onClick={handleLogout}
+			>
+				Đăng xuất
+			</Button>
+		</div>
+	);
 		return (
 			<div
 				style={{
@@ -97,7 +109,6 @@ export class AvatarGroup extends Component {
 				</Popover>
 			</div>
 		);
-	}
 }
 
 export default AvatarGroup;

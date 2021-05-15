@@ -1,38 +1,57 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
-import { Layout, Menu, Breadcrumb, Modal, Upload, Popover, Input } from 'antd';
-import SliderFormUpload from './SliderFormUpload';
-import { LayoutProvider } from '../../context/LayoutContext';
 import {
 	PictureOutlined,
 	PlayCircleFilled,
-	VideoCameraFilled,
+	VideoCameraFilled
 } from '@ant-design/icons';
-
+import { Menu } from 'antd';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { getCurrentType } from '../../actions/rootAction';
+import SliderFormUpload from './SliderFormUpload';
 const Slider = ({ clickHandler }) => {
-
+	const [currentType, setCurrentType] = useState('pictures');
+	const dispatch = useDispatch();
+	const handleItemClick = e => {
+		// console.log(e.key);
+		clickHandler(e);
+		dispatch(getCurrentType(e.key));
+		setCurrentType(e.key);
+	}
 	return (
 		<div>
 			<SliderFormUpload />
 			<div>
 				<hr></hr>
 				<Menu
-					onClick={clickHandler}
+					onClick={handleItemClick}
 					style={{ width: 256 }}
-					defaultSelectedKeys={['1']}
-					// defaultOpenKeys={['']}
+					defaultSelectedKeys={[currentType]}
 					mode="inline"
 				>
-					<Menu.Item key="1">
-						<PictureOutlined />
+					<Menu.Item key="pictures">
+						<Link
+							to='/main/pictures'>
+							<PictureOutlined />
 						Ảnh
+						</Link>
+
 					</Menu.Item>
-					<Menu.Item key="2">
-						<PlayCircleFilled />
+					<Menu.Item key="musics">
+						<Link
+							to='/main/musics'>
+							<PlayCircleFilled />
 						Âm nhạc
+					</Link>
+
 					</Menu.Item>
-					<Menu.Item key="3">
-						<VideoCameraFilled />
+					<Menu.Item key="videos" >
+						<Link
+							to='/main/videos'>
+							<VideoCameraFilled />
 						Video
+					</Link>
+
 					</Menu.Item>
 				</Menu>
 			</div>

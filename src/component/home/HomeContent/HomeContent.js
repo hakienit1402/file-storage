@@ -1,32 +1,48 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import DataTable from "./DataTable";
 import HomeContentButton from "./HomeContentButton";
 import NavigationTab from "./NavigationTab";
-const HomeContent = ({ active,listBreadcrumb }) => {
-  const [listRowKeys,setListRowKeys] = useState([]);
-  const [listRecord,setListRecord] = useState([]);
-  const sendListRowKeys =(listkeys)=>{
+// import PropTypes from 'prop-types';
+// a.propTypes = {
+// };
+// HomeContent.defaultProps = {
+//   key: 'pictures'
+// };
+const HomeContent = () => {
+
+  const [listRowKeys, setListRowKeys] = useState([]);
+  const [listRecord, setListRecord] = useState([]);
+  const [listBreadcrumb, setListBreadcrumb] = useState([''])
+  const sendListRowKeys = (listkeys) => {
     setListRowKeys(listkeys)
   }
-  const sendListRecords =(listRecords)=>{
+  const sendListRecords = (listRecords) => {
     setListRecord(listRecords)
   }
-  console.log(listRowKeys)
-  console.log(listRecord)
+  // const [a,setA] = useState(0);
+  const setOK = (index) => {
+    setListBreadcrumb(listBreadcrumb.slice(0, index + 1));
+    // setA(index);
+  }
+
+  // console.log(listRecord)
   return (
     <>
       <div style={{ margin: "3rem 2rem 0 0" }}>
-        <NavigationTab listBreadcrumb={listBreadcrumb} />
-      </div>
-      <div>
-        <HomeContentButton 
-        
+        <NavigationTab
+          listBreadcrumb={listBreadcrumb}
+          setListBreadcrumb={setOK}
         />
       </div>
       <div>
-        <DataTable active={active} 
-       sendListRowKeys={sendListRowKeys}
-       sendListRecords={sendListRecords}
+        <HomeContentButton
+        />
+      </div>
+      <div>
+        <DataTable
+          sendListRowKeys={sendListRowKeys}
+          sendListRecords={sendListRecords}
+          setListBreadcrumb={setListBreadcrumb}
         />
       </div>
     </>

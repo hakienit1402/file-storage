@@ -1,5 +1,30 @@
 .editable-row .ant-form-item-explain {
     position: absolute;
     top: 100%;
-    font-size: 12px;
+    font-size: 13px;
+  }
+body{
+    font-family: Roboto,'Courier New', Courier, monospace;
+    padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+  th.ant-table-cell{
+    font-family:Roboto2;
+
+  }
+  .img-type{
+    width: 25px;
+    height: 25px;
+  }
+  .ant-table-row{
+    cursor: pointer;
+  }
+  @font-face {
+    font-family: 'Roboto';
+    src: local('Roboto'), url(./fonts/Roboto/Roboto-Regular.ttf) format('truetype');
+  }
+  @font-face {
+    font-family: 'Roboto2';
+    src: local('Roboto'), url(./fonts/Roboto/Roboto-Medium.ttf) format('truetype');
   }
