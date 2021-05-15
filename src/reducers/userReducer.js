@@ -1,48 +1,44 @@
-import { LOGIN_FAIL, LOGIN_REQUEST, LOGIN_SUCCESS, REGISTER_FAIL, REGISTER_REQUEST, REGISTER_SUCCESS } from "../constants/authConstants";
+import { LOGIN_FAIL, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT, REGISTER_FAIL, REGISTER_REQUEST, REGISTER_SUCCESS } from "../constants/authConstants";
 
-const userReducer = (state = {}, action) => {
+const userReducer = (state = { }, action) => {
   const { type, payload } = action;
   switch (type) {
     case REGISTER_REQUEST:
       return {
         ...state,
-       
+
       };
-      case REGISTER_SUCCESS:
-        return {
-          ...state,
-         
-        };
+    case REGISTER_SUCCESS:
+      return {
+        ...state,
+
+      };
     case REGISTER_FAIL:
       return {
         ...state,
-       
+
       };
     case LOGIN_REQUEST:
       return {
-        ...state, 
-        loading:true,
         
+        loading: true,
+
         // isLoggedIn: true,
         // user: payload.user,
       };
     case LOGIN_SUCCESS:
       return {
-        ...state,
-      loading: false, 
-      users: action.payload 
+        users: action.payload,
+        error: null
       };
     case LOGIN_FAIL:
       return {
-        ...state,
-        loading: false, error: action.payload
+         users: null, error: action.payload
       };
-    // case LOGOUT:
-    //   return {
-    //     ...state,
-    //     isLoggedIn: false,
-    //     user: null,
-    //   };
+    case LOGOUT:
+      return {
+        users: null
+      };
     default:
       return state;
   }

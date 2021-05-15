@@ -1,20 +1,19 @@
-import react from 'react';
-import { Breadcrumb, Alert, Popconfirm } from 'antd';
-import { HomeOutlined, UserOutlined } from '@ant-design/icons';
+import { HomeOutlined } from '@ant-design/icons';
+import { Breadcrumb } from 'antd';
 
-const NavigationTab = ({listBreadcrumb}) => {
-	// console.log(listBreadcrumb[0])
+const NavigationTab = ({ listBreadcrumb, setListBreadcrumb }) => {
+	// console.log(listBreadcrumb)
 	return (
 		<>
 			<Breadcrumb>
-			<Breadcrumb.Item href="">
-				<HomeOutlined />
-			</Breadcrumb.Item>
-			{listBreadcrumb.map((item,idx)=>(
-				<Breadcrumb.Item key={idx}>
-				<span>{item}</span>
-			</Breadcrumb.Item>
-			))}
+				<Breadcrumb.Item href="">
+					<HomeOutlined />
+				</Breadcrumb.Item>
+				{listBreadcrumb.map((item, idx) => (
+					<Breadcrumb.Item key={idx} onClick={()=>{setListBreadcrumb(idx);}}>
+						<a>{item}</a>
+					</Breadcrumb.Item>
+				))}
 			</Breadcrumb>
 			<hr></hr>
 		</>

@@ -1,35 +1,60 @@
-import { Form, Input, Popconfirm, Table, Typography, message } from "antd";
+import { EditFilled } from '@ant-design/icons';
+import { Form, Input, message, Table, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getListMusics, updateMusicStore } from "../../../actions/musicAction";
+import { updateMusicStore } from "../../../actions/musicAction";
+import { getListDatas } from "../../../actions/rootAction";
 import FolderIcon from "../../../images/folder.png";
 import Mp3Icon from "../../../images/music-main.png";
 
-const renderIcon = (record) => {
-  switch (record.extension) {
-    case null:
-      return <img alt="#" src={FolderIcon} style={{ width: 30, height: 30 }} />;
+const renderIcon = (extension) => {
+  switch (extension) {
+    case "FOLDER":
+      return <img className="img-type" alt="#" src={FolderIcon} />;
     case "mp3":
-      return <img alt="#" src={Mp3Icon} style={{ width: 30, height: 30 }} />;
+      return <img className="img-type" alt="#" src={Mp3Icon} />;
     default:
       break;
   }
 };
-const renderSize = (record) => (record.size != 0 ? record.size : "/");
-const DataTable = ({ active, sendListRowKeys, sendListRecords }) => {
-  // console.log(active);
+const renderSize = (size) => (size != 0 ? (size / (1024 * 1024)).toFixed(2) + " MB" : "/");
+const DataTable = ({ sendListRowKeys, sendListRecords, setListBreadcrumb }) => {
   const [selectedRowKeys, setSelectedRowked] = useState([]);
   const [editingKey, setEditingKey] = useState("");
+  // console.log(key, 'keyy');
 
-  const listMusics = useSelector((state) => state.musics);
-  var { loading, error, musics } = listMusics;
+  const listDatas = useSelector((state) => state.file);
+  var { loading, error, datas } = listDatas;
+
+  const currentType = useSelector((state) => state.fileType);
+  var { type } = currentType;
+  // console.log(type, 'ehehhe');
+
+
+  const dataUsers = useSelector((state) => state.auth);
+  var { loading, error, users } = dataUsers;
+
+  // parent
+  const [parent, setParent] = useState('');
+  const [listParents, setListParents] = useState([]);
+
   const isEditing = (record) => record.id === editingKey;
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  //getdata
+
+
   useEffect(() => {
-    dispatch(getListMusics());
-  }, []);
+
+    dispatch(getListDatas(type, users, parent));
+
+  }, [parent, type]);
+
+  useEffect(() => {
+    setParent('');
+    setListBreadcrumb([]);
+    setListParents([]);
+
+  }, [type]);
   const EditableCell = ({
     editing,
     dataIndex,
@@ -52,7 +77,7 @@ const DataTable = ({ active, sendListRowKeys, sendListRecords }) => {
               rules={[
                 {
                   required: true,
-                  message: `Please Input ${title}!`,
+                  message: `Vui lòng nhập dữ liệu!`,
                 },
               ]}
             >
@@ -81,20 +106,21 @@ const DataTable = ({ active, sendListRowKeys, sendListRecords }) => {
     try {
       const row = await form.validateFields();
       // console.log(row.name);
-      const index = musics.findIndex((item) => record.id === item.id);
-      const indexName = musics.findIndex((item) => row.name === item.name);
+      const index = datas.findIndex((item) => record.id === item.id);
+      const indexName = datas.findIndex((item) => row.name === item.name && datas[index].extension === item.extension);
       if (indexName !== -1) {
         message.error(
-          (row.extension !== null ? "File " : "Thư mục ") +`"${row.name}"` + " tồn tại rồi nè!"
+          (row.extension !== null ? "File " : "Thư mục ") + `"${row.name}"` + " đã tồn tại!"
         );
-      }
-      // console.log(index);
-      else if (index !== -1) {
-        dispatch(updateMusicStore(musics, row.name, index));
-        setEditingKey("");
       } else {
-        setEditingKey("");
+        if (index !== -1) {
+          dispatch(updateMusicStore(datas, row.name, index));
+          setEditingKey("");
+        } else {
+          setEditingKey("");
+        }
       }
+
     } catch (errInfo) {
       console.log("Validate Failed:", errInfo);
     }
@@ -102,26 +128,26 @@ const DataTable = ({ active, sendListRowKeys, sendListRecords }) => {
 
   const columns = [
     {
-      title: "Type",
+      title: "Loại",
       dataIndex: "type",
-      render: (text, record) => renderIcon(record),
+      render: (_, record) => renderIcon(record.extension),
     },
     {
-      title: "Name",
+      title: "Tên",
       dataIndex: "name",
       editable: true,
     },
     {
       title: "Kích thước",
       dataIndex: "size",
-      render: (text, record) => renderSize(record),
+      render: (_, record) => renderSize(record.size),
     },
     {
       title: "Sửa đổi lần cuối",
       dataIndex: "modifyDate",
     },
     {
-      title: "",
+      title: "Thao tác",
       dataIndex: "operation",
       render: (_, record) => {
         const editable = isEditing(record);
@@ -133,18 +159,20 @@ const DataTable = ({ active, sendListRowKeys, sendListRecords }) => {
                 marginRight: 8,
               }}
             >
-              Save
+              Lưu
             </a>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-              <a>Cancel</a>
-            </Popconfirm>
+            <a onClick={cancel}>Hủy</a>
           </span>
         ) : (
           <Typography.Link
             disabled={editingKey !== ""}
             onClick={() => edit(record)}
           >
-            Edit
+            <EditFilled
+              style={{
+                fontSize: 18, paddingLeft: 20
+              }
+              } />
           </Typography.Link>
         );
       },
@@ -169,7 +197,6 @@ const DataTable = ({ active, sendListRowKeys, sendListRecords }) => {
 
   const onSelectChange = (selectedRowKeys, record) => {
     setSelectedRowked(selectedRowKeys);
-    // console.log(record)
     sendListRecords(record);
     sendListRowKeys(selectedRowKeys);
   };
@@ -178,43 +205,6 @@ const DataTable = ({ active, sendListRowKeys, sendListRecords }) => {
     selectedRowKeys,
     onChange: onSelectChange,
     hideDefaultSelections: true,
-    // selections: [
-    //   {
-    //     key: "all-data",
-    //     text: "Select All Data",
-    //     onSelect: () => {
-    //       setSelectedRowked([...Array(46).keys()]);
-    //     },
-    //   },
-    //   {
-    //     key: "odd",
-    //     text: "Select Odd Row",
-    //     onSelect: (changableRowKeys) => {
-    //       let newSelectedRowKeys = [];
-    //       newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-    //         if (index % 2 !== 0) {
-    //           return false;
-    //         }
-    //         return true;
-    //       });
-    //       setSelectedRowked(newSelectedRowKeys);
-    //     },
-    //   },
-    //   {
-    //     key: "even",
-    //     text: "Select Even Row",
-    //     onSelect: (changableRowKeys) => {
-    //       let newSelectedRowKeys = [];
-    //       newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-    //         if (index % 2 !== 0) {
-    //           return true;
-    //         }
-    //         return false;
-    //       });
-    //       setSelectedRowked(newSelectedRowKeys);
-    //     },
-    //   },
-    // ],
   };
   return (
     <div>
@@ -227,8 +217,17 @@ const DataTable = ({ active, sendListRowKeys, sendListRecords }) => {
         }}
         columns={mergedColumns}
         rowClassName="editable-row"
-        dataSource={musics}
+        dataSource={datas}
         rowKey="id"
+        onRow={(record, _) => {
+          return record.extension === "FOLDER" ? {
+            onClick: () => {
+              setParent(record.name);
+              setListParents([...listParents, record.name]);
+              setListBreadcrumb([...listParents, record.name]);
+            }
+          } : { onDoubleClick: () => { alert('Dang chay', record.name) } };
+        }}
       />
     </div>
   );
