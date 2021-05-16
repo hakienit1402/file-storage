@@ -2,41 +2,86 @@ import { EditFilled } from '@ant-design/icons';
 import { Form, Input, message, Table, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateMusicStore } from "../../../actions/musicAction";
-import { getListDatas } from "../../../actions/rootAction";
+import { editFileName, getListDatas, updateParent } from "../../../actions/rootAction";
 import FolderIcon from "../../../images/folder.png";
-import Mp3Icon from "../../../images/music-main.png";
+import JpgIcon from "../../../images/jpg.svg";
+import Mp3Icon from "../../../images/mp3.png";
+import Mp4Icon from "../../../images/mp4.png";
+import PngIcon from "../../../images/png.svg";
 
 const renderIcon = (extension) => {
   switch (extension) {
+    case "jpg":
+      return <img className="img-type" alt="#" src={JpgIcon} />;
+    case "png":
+      return <img className="img-type" alt="#" src={PngIcon} />;
     case "FOLDER":
       return <img className="img-type" alt="#" src={FolderIcon} />;
     case "mp3":
       return <img className="img-type" alt="#" src={Mp3Icon} />;
+    case "mp4":
+      return <img className="img-type" alt="#" src={Mp4Icon} />;
     default:
       break;
   }
 };
 const renderSize = (size) => (size != 0 ? (size / (1024 * 1024)).toFixed(2) + " MB" : "/");
-const DataTable = ({ sendListRowKeys, sendListRecords, setListBreadcrumb }) => {
+const pictureFilter = [
+  {
+    text: 'Thư mục',
+    value: 'FOLDER',
+  },
+
+  {
+    text: 'PNG',
+    value: 'png',
+  },
+  {
+    text: 'JPG',
+    value: 'jpg',
+  },
+]
+const musicFilter = [
+  {
+    text: 'Thư mục',
+    value: 'FOLDER',
+  },
+
+  {
+    text: 'MP3',
+    value: 'mp3',
+  },
+]
+const videoFilter = [
+  {
+    text: 'Thư mục',
+    value: 'FOLDER',
+  },
+
+  {
+    text: 'MP4',
+    value: 'mp4',
+  },
+]
+const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb }) => {
   const [selectedRowKeys, setSelectedRowked] = useState([]);
   const [editingKey, setEditingKey] = useState("");
-  // console.log(key, 'keyy');
+
+
 
   const listDatas = useSelector((state) => state.file);
   var { loading, error, datas } = listDatas;
 
   const currentType = useSelector((state) => state.fileType);
   var { type } = currentType;
-  // console.log(type, 'ehehhe');
+
+  const currenParent = useSelector((state) => state.parent);
+  var { parent } = currenParent;
 
 
   const dataUsers = useSelector((state) => state.auth);
   var { loading, error, users } = dataUsers;
 
-  // parent
-  const [parent, setParent] = useState('');
-  const [listParents, setListParents] = useState([]);
 
   const isEditing = (record) => record.id === editingKey;
   const [form] = Form.useForm();
@@ -44,16 +89,18 @@ const DataTable = ({ sendListRowKeys, sendListRecords, setListBreadcrumb }) => {
 
 
   useEffect(() => {
-
     dispatch(getListDatas(type, users, parent));
-
-  }, [parent, type]);
+    // console.log('datatable paree type- -', parent,'--', type);
+  }, [parent]);
 
   useEffect(() => {
-    setParent('');
-    setListBreadcrumb([]);
-    setListParents([]);
-
+    // console.log('datatable type - ', type);
+    dispatch(getListDatas(type, users, ''));
+    dispatch(updateParent(''));
+    updateListBreadcrumb();
+    setEditingKey("");
+    setSelectedRowked([]);
+    clearAll();
   }, [type]);
   const EditableCell = ({
     editing,
@@ -114,28 +161,43 @@ const DataTable = ({ sendListRowKeys, sendListRecords, setListBreadcrumb }) => {
         );
       } else {
         if (index !== -1) {
-          dispatch(updateMusicStore(datas, row.name, index));
-          setEditingKey("");
-        } else {
-          setEditingKey("");
+          dispatch(editFileName(datas, row.name, index, type, users.token));
         }
+        setEditingKey("");
       }
 
     } catch (errInfo) {
       console.log("Validate Failed:", errInfo);
     }
   };
-
+  const [filteredInfo, setFilteredInfo] = useState({});
+  const [sortedInfo, setSortedInfo] = useState({});
+  const handleChange = (pagination, filters, sorter) => {
+    setFilteredInfo(filters);
+    setSortedInfo(sorter);
+  };
+  const clearAll = () => {
+    setFilteredInfo(null);
+    setSortedInfo(null);
+  };
   const columns = [
     {
       title: "Loại",
       dataIndex: "type",
       render: (_, record) => renderIcon(record.extension),
+      filteredValue: filteredInfo && (filteredInfo.type || null),
+      filters: type === 'pictures' ? pictureFilter : type === 'musics' ? musicFilter : videoFilter,
+      filterMultiple: false,
+      onFilter: (value, record) => record.extension.indexOf(value) === 0,
+      ellipsis: true,
     },
     {
       title: "Tên",
       dataIndex: "name",
       editable: true,
+      sorter: (a, b) => a.name.length - b.name.length,
+      sortOrder: sortedInfo && (sortedInfo.field === 'name' && sortedInfo.order),
+      ellipsis: true,
     },
     {
       title: "Kích thước",
@@ -150,8 +212,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, setListBreadcrumb }) => {
       title: "Thao tác",
       dataIndex: "operation",
       render: (_, record) => {
-        const editable = isEditing(record);
-        return editable ? (
+        return isEditing(record) ? (
           <span>
             <a
               onClick={() => save(record)}
@@ -209,6 +270,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, setListBreadcrumb }) => {
   return (
     <div>
       <Table
+        onChange={handleChange}
         rowSelection={rowSelection}
         components={{
           body: {
@@ -220,13 +282,16 @@ const DataTable = ({ sendListRowKeys, sendListRecords, setListBreadcrumb }) => {
         dataSource={datas}
         rowKey="id"
         onRow={(record, _) => {
-          return record.extension === "FOLDER" ? {
-            onClick: () => {
-              setParent(record.name);
-              setListParents([...listParents, record.name]);
-              setListBreadcrumb([...listParents, record.name]);
+          return {
+            onDoubleClick: () => {
+              if (record.extension === 'FOLDER') {
+                dispatch(updateParent(record.name));
+                updateListBreadcrumb(record.name)
+              } else {
+                alert('PLAYYYY');
+              }
             }
-          } : { onDoubleClick: () => { alert('Dang chay', record.name) } };
+          }
         }}
       />
     </div>

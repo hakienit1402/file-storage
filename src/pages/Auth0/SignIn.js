@@ -9,19 +9,16 @@ import wave from '../../images/auth/wave.png';
 import './style.css';
 
 
-// SignIn.propTypes = {
-
-// };
 
 function SignIn() {
     const [eventU, setU] = useState(false);
     const [eventP, setP] = useState(false);
 
-    const user = useSelector((state) => state.auth);
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-
+    const user = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const { loading, error, users } = user;
     const onChangeUsername = (e) => {
@@ -34,25 +31,21 @@ function SignIn() {
     };
     const his = useHistory();
     const [isClick, setIsClick] = useState(false);
-    const [isUser, setIsUser] = useState(false);
     const handleLogin = e => {
         e.preventDefault();
         setIsClick(true);
         dispatch(login(username, password));
     }
     useEffect(() => {
+        // console.log('user ', users);
         if (users) {
-            setIsUser(false);
             his.push('/main/pictures');
         }
-        else {
-            setIsUser(true);
-        }
-    }, [user]);
+    }, [users]);
 
     return (
         <div className='auth-page'>
-            <link crossOrigin href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet" />
+            
             <img className="wave" src={wave} />
             <div className="container-auth">
                 <div className="img-auth">
@@ -80,7 +73,7 @@ function SignIn() {
                                 <input type="password" className="input" onFocus={() => { setP(true) }} onBlur={(e) => { e.target.value === '' && setP(false) }} onChange={onChangePassword} />
                             </div>
                         </div>
-                        {isClick && isUser && <p style={{ fontSize: 14, color: '#b90a0a' }}>Tài khoản hoặc mật khẩu không chính xác.</p>}
+                        {error && isClick && <p style={{ fontSize: 14, color: '#b90a0a' }}>{error}</p>}
                         <Link to="/signup" style={{ textDecoration: 'underline' }} className='a-signin'>Quên mật khẩu?</Link>
                         <input type="submit" className="btn-auth" value="Đăng nhập" />
                         <div className='bt'><p>Bạn chưa có tài khoản? </p><Link to="./signup">Đăng ký</Link> <p>ngay</p>.</div>

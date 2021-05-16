@@ -1,16 +1,17 @@
 import { HomeOutlined } from '@ant-design/icons';
 import { Breadcrumb } from 'antd';
 
-const NavigationTab = ({ listBreadcrumb, setListBreadcrumb }) => {
-	// console.log(listBreadcrumb)
+const NavigationTab = ({ listBreadcrumb, handleItemBreadcrumbClick }) => {
 	return (
 		<>
 			<Breadcrumb>
-				<Breadcrumb.Item href="">
-					<HomeOutlined />
+				<Breadcrumb.Item onClick={() => { handleItemBreadcrumbClick(-1); }}>
+					<a><HomeOutlined /></a>
 				</Breadcrumb.Item>
 				{listBreadcrumb.map((item, idx) => (
-					<Breadcrumb.Item key={idx} onClick={()=>{setListBreadcrumb(idx);}}>
+					<Breadcrumb.Item key={idx} onClick={() => {
+						handleItemBreadcrumbClick(idx);
+					}}>
 						<a>{item}</a>
 					</Breadcrumb.Item>
 				))}

@@ -154,7 +154,6 @@ function SignUp() {
     }
     return (
         <div className='auth-page'>
-            <link crossOrigin href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet" />
             <img className="wave" src={wave} />
             <div className="container-auth">
                 <div className="img-auth">
