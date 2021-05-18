@@ -1,17 +1,11 @@
 import axios from "axios";
 import {
     LOGIN_FAIL,
-    LOGIN_REQUEST,
-
-
     LOGIN_SUCCESS,
-
-
     LOGOUT,
-
-
     REGISTER_REQUEST
 } from "../constants/authConstants";
+import { GET_CURRENT, GET_PARENT } from "./type";
 const HEAD_URI = "http://localhost:8080/api";
 export const login = (username, password) => (dispatch) => {
     // dispatch({ type: LOGIN_REQUEST, payload: { username, password } })
@@ -21,16 +15,12 @@ export const login = (username, password) => (dispatch) => {
             `${HEAD_URI}/signin`, { username, password }
         )
         .then((res) => {
-            // localStorage.setItem("isAuth",true)
-
             dispatch({ type: LOGIN_SUCCESS, payload: res.data });
-            // window.location.reload()
-            // console.log('asdjadsa');
-            // Cookies.set('user-data',JSON.stringify(res.data))
+            dispatch({ type: GET_PARENT, payload: '' });
+            dispatch({ type: GET_CURRENT, payload: 'pictures' });
         })
         .catch((err) => {
-            // console.log(err);
-            dispatch({ type: LOGIN_FAIL, payload: "Tài khoản hoặc mật khẩu không chính xác"});
+            dispatch({ type: LOGIN_FAIL, payload: "Tài khoản hoặc mật khẩu không chính xác" });
         }
         )
 };
@@ -52,7 +42,8 @@ export const register = (fullname, username, email, password) => (dispatch) => {
 }
 export const logout = () => (dispatch) => {
     dispatch({ type: LOGOUT });
-    // localStorage.removeItem('isAuth')
+    dispatch({ type: GET_CURRENT });
+    dispatch({ type: GET_PARENT });
 }
 export const checkOTP = (otp) => (dispatch) => {
     axios

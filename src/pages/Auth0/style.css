@@ -1,5 +1,5 @@
 .auth-page{
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Roboto', sans-serif;
 }
 
 .auth-page  .wave{
@@ -133,7 +133,6 @@
 	padding: 0.5rem 0.7rem;
 	font-size: 15px;
 	color: #555;
-	font-family: 'poppins', sans-serif;
 }
 
 .auth-page  .input-div.pass{

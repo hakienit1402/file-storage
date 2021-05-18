@@ -7,15 +7,14 @@ import { Menu } from 'antd';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { getCurrentType } from '../../actions/rootAction';
+import { updateType } from '../../actions/rootAction';
 import SliderFormUpload from './SliderFormUpload';
-const Slider = ({ clickHandler }) => {
-	const [currentType, setCurrentType] = useState('pictures');
+const Slider = ({ clickHandler, type }) => {
+	const [currentType, setCurrentType] = useState(type || 'pictures');
 	const dispatch = useDispatch();
 	const handleItemClick = e => {
-		// console.log(e.key);
-		clickHandler(e);
-		dispatch(getCurrentType(e.key));
+		clickHandler(e.key);
+		dispatch(updateType(e.key));
 		setCurrentType(e.key);
 	}
 	return (

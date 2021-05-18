@@ -9,7 +9,8 @@ import {
 
   POST_EDIT_MUSIC_FAIL, POST_EDIT_MUSIC_SUCCESS,
 
-  UPDATE_STORE_MUSIC_TMP
+  UPDATE_STORE_MUSIC_TMP,
+  UPDATE_STORE_TMP
 } from "../actions/type";
 
 const musicReducer = (
@@ -25,7 +26,7 @@ const musicReducer = (
       return { loading: false, error: action.payload };
     case POST_EDIT_MUSIC:
       return { loading: true };
-    case UPDATE_STORE_MUSIC_TMP:
+    case UPDATE_STORE_TMP:
       return { loading: false, datas: action.payload };
     case GET_LIST_MUSIC:
       return state;

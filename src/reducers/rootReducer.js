@@ -3,7 +3,7 @@ import { combineReducers } from 'redux'
 import imageReducer from './imageReducer'
 import musicReducer from './musicReducer'
 import userReducer from './userReducer'
-import {fileReducer,fileTypeReducer} from './fileRuducer'
+import { fileReducer, fileTypeReducer, parentReducer } from './fileRuducer'
 
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'
@@ -11,15 +11,16 @@ import storage from 'redux-persist/lib/storage'
 const persisConfig = {
     key: 'root',
     storage,
-    whitelist: ['auth', 'musics', 'images']
+    whitelist: ['auth', 'musics', 'images', 'fileType','parent']
 }
 const rootReducer = combineReducers({
     auth: userReducer,
     images: imageReducer,
     musics: musicReducer,
-    
+
     file: fileReducer,
-    fileType:fileTypeReducer
+    fileType: fileTypeReducer,
+    parent: parentReducer
 })
 
 // export default rootReducer

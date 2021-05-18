@@ -4,13 +4,19 @@ import {
     GET_LIST,
     GET_LIST_SUCCESS,
 
+    GET_PARENT,
+
     POST_DELETE_MUSIC,
     POST_DELETE_MUSIC_FAIL,
-    UPDATE_STORE_MUSIC_TMP
+
+    UPDATE_STORE_TMP
 } from "./type";
 
-export const getCurrentType = (type) => (dispatch) => {
+export const updateType = (type) => (dispatch) => {
     dispatch({ type: GET_CURRENT, payload: type });
+}
+export const updateParent = (parent) => (dispatch) => {
+    dispatch({ type: GET_PARENT, payload: parent });
 }
 
 const HEAD_URI = "http://localhost:8080/api/user";
@@ -31,7 +37,6 @@ export const getListDatas = (typeFile, data, parent) => (dispatch) => {
         axios(config)
             .then((res) => {
                 dispatch({ type: GET_LIST_SUCCESS, payload: res.data });
-
             }).catch(() => {
                 // dispatch({ type: LOGOUT });
                 console.log('err1');
@@ -41,39 +46,66 @@ export const getListDatas = (typeFile, data, parent) => (dispatch) => {
         // dispatch({ type: LOGOUT });
     }
 };
-
-export const editMusicItem = (musics, name, index) => (dispatch) => {
-    let dataAlterUpdate = [...musics];
-    let oldName = musics[index].name;
-    dataAlterUpdate[index].name = name;
+const formatDateTime = () => {
+    let d = new Date();
+    return d.getFullYear() + '-' +
+        ('0' + (d.getMonth() + 1)).slice(-2) + '-' +
+        ('0' + d.getDate()).slice(-2) + ' ' +
+        ('0' + d.getHours()).slice(-2) + ':' +
+        ('0' + d.getMinutes()).slice(-2) + ':' +
+        ('0' + d.getSeconds()).slice(-2);
+}
+export const editFileName = (datas, new_name, index, typeFile, token) => (dispatch) => {
+    let dataAlterUpdate = [...datas];
+    let oldName = datas[index].name;
+    dataAlterUpdate[index].name = new_name;
+    dataAlterUpdate[index].modifyDate = formatDateTime();
     const bodyData = {
-        id: musics[index].id,
-        new_name: name,
+        id: datas[index].id,
+        new_name: new_name,
         old_name: oldName,
-        extension: musics[index].extension,
-        creator: musics[index].creator
+        cur_parent: datas[index].parent,
+        extension: datas[index].extension,
+        creator: datas[index].creator
     }
-    dispatch({ type: UPDATE_STORE_MUSIC_TMP, payload: dataAlterUpdate });
     // id, new_name,old_name,extension,creator
 
     // dispatch({ type: POST_EDIT_MUSIC });
-    axios
-        .put(`${HEAD_URI}/name`, bodyData
-            //   dataAlterUpdate[index]
-        )
-        .then((res) => {
-            //   console.log(res)
-            dispatch({ type: UPDATE_STORE_MUSIC_TMP, payload: dataAlterUpdate });
-        }).catch((err) => {
-            dispatch({ type: UPDATE_STORE_MUSIC_TMP, payload: musics });
-            // dispatch({ type: POST_EDIT_MUSIC_FAIL, payload:err.message });
-            // console.log("iiiiiiii")
+
+    var config = {
+        method: 'put',
+        url: `${HEAD_URI}/${typeFile}/name`,
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        data: bodyData
+    };
+
+    axios(config)
+        .then(function () {
+            dispatch({ type: UPDATE_STORE_TMP, payload: dataAlterUpdate });
+            // console.log(JSON.stringify(response.data));
         })
+        .catch(function () {
+            dispatch({ type: UPDATE_STORE_TMP, payload: datas });
+            // console.log(error);
+        });
 };
 export const deleteMusicItem = (listkey) => (dispatch) => {
+    console.log(listkey,'root action');
+    // id, [name, extension], state, creator ->>>> trash, untrash
 
-    try {
-        dispatch({ type: POST_DELETE_MUSIC });
+    // const bodyData = {
+    //     id: datas[index].id,
+    //     new_name: new_name,
+    //     old_name: oldName,
+    //     cur_parent: datas[index].parent,
+    //     extension: datas[index].extension,
+    //     creator: datas[index].creator
+    // }
+    // try {
+        // dispatch({ type: POST_DELETE_MUSIC });
         // let dataAlterDelete = [...musics]
         // console.log(dataAlterDelete)
         // console.log(data);
@@ -89,7 +121,9 @@ export const deleteMusicItem = (listkey) => (dispatch) => {
         // 	.then((res) => {
         // dispatch({ type: POST_DELETE_MUSIC_SUCCESS, payload: res.data });
         // });
-    } catch (error) {
-        dispatch({ type: POST_DELETE_MUSIC_FAIL, payload: error.message });
-    }
+    // } catch (error) {
+    //     dispatch({ type: POST_DELETE_MUSIC_FAIL, payload: error.message });
+    // }
 };
+
+
