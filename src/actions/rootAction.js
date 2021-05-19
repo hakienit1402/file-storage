@@ -1,4 +1,5 @@
 import axios from "axios";
+import { LOGOUT } from "../constants/authConstants";
 import {
     GET_CURRENT,
     GET_LIST,
@@ -36,14 +37,17 @@ export const getListDatas = (typeFile, data, parent) => (dispatch) => {
         // console.log(data);
         axios(config)
             .then((res) => {
-                dispatch({ type: GET_LIST_SUCCESS, payload: res.data });
+                var data = res.data;
+                // console.log(data);
+                data.sort((a, b) => { return new Date(b.modifyDate) - new Date(a.modifyDate) });
+                dispatch({ type: GET_LIST_SUCCESS, payload: data });
             }).catch(() => {
-                // dispatch({ type: LOGOUT });
+                dispatch({ type: LOGOUT });
                 console.log('err1');
             });
     } catch (error) {
         console.log('err2');
-        // dispatch({ type: LOGOUT });
+        dispatch({ type: LOGOUT });
     }
 };
 const formatDateTime = () => {
@@ -93,7 +97,7 @@ export const editFileName = (datas, new_name, index, typeFile, token) => (dispat
         });
 };
 export const deleteMusicItem = (listkey) => (dispatch) => {
-    console.log(listkey,'root action');
+    console.log(listkey, 'root action');
     // id, [name, extension], state, creator ->>>> trash, untrash
 
     // const bodyData = {
@@ -105,22 +109,22 @@ export const deleteMusicItem = (listkey) => (dispatch) => {
     //     creator: datas[index].creator
     // }
     // try {
-        // dispatch({ type: POST_DELETE_MUSIC });
-        // let dataAlterDelete = [...musics]
-        // console.log(dataAlterDelete)
-        // console.log(data);
-        // const dataDelete = data.filter(	res.data =>
-        // 	data
-        // );
+    // dispatch({ type: POST_DELETE_MUSIC });
+    // let dataAlterDelete = [...musics]
+    // console.log(dataAlterDelete)
+    // console.log(data);
+    // const dataDelete = data.filter(	res.data =>
+    // 	data
+    // );
 
-        // axios
-        // 	.post(
-        // 		'https://file-storage-2021.herokuapp.com/musics/deletemussic',
-        // data
-        // 	)
-        // 	.then((res) => {
-        // dispatch({ type: POST_DELETE_MUSIC_SUCCESS, payload: res.data });
-        // });
+    // axios
+    // 	.post(
+    // 		'https://file-storage-2021.herokuapp.com/musics/deletemussic',
+    // data
+    // 	)
+    // 	.then((res) => {
+    // dispatch({ type: POST_DELETE_MUSIC_SUCCESS, payload: res.data });
+    // });
     // } catch (error) {
     //     dispatch({ type: POST_DELETE_MUSIC_FAIL, payload: error.message });
     // }

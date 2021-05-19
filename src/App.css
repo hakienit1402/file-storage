@@ -33,6 +33,12 @@ body{
     font-weight: 600;
     font-size: 15px;
   }
+  th.type-custom{
+    width: 150px;
+  }
+  th.name-custom{
+    width: 400px;
+  }
 
   
   

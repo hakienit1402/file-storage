@@ -8,6 +8,7 @@ import JpgIcon from "../../../images/jpg.svg";
 import Mp3Icon from "../../../images/mp3.png";
 import Mp4Icon from "../../../images/mp4.png";
 import PngIcon from "../../../images/png.svg";
+import SvgIcon from "../../../images/svg.svg";
 
 const renderIcon = (extension) => {
   switch (extension) {
@@ -15,6 +16,8 @@ const renderIcon = (extension) => {
       return <img className="img-type" alt="#" src={JpgIcon} />;
     case "png":
       return <img className="img-type" alt="#" src={PngIcon} />;
+    case "svg":
+      return <img className="img-type" alt="#" src={SvgIcon} />;
     case "FOLDER":
       return <img className="img-type" alt="#" src={FolderIcon} />;
     case "mp3":
@@ -25,6 +28,7 @@ const renderIcon = (extension) => {
       break;
   }
 };
+
 const renderSize = (size) => (size != 0 ? (size / (1024 * 1024)).toFixed(2) + " MB" : "/");
 const pictureFilter = [
   {
@@ -39,6 +43,10 @@ const pictureFilter = [
   {
     text: 'JPG',
     value: 'jpg',
+  },
+  {
+    text: 'SVG',
+    value: 'svg',
   },
 ]
 const musicFilter = [
@@ -67,10 +75,8 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb }) =
   const [selectedRowKeys, setSelectedRowked] = useState([]);
   const [editingKey, setEditingKey] = useState("");
 
-
-
   const listDatas = useSelector((state) => state.file);
-  var { loading, error, datas } = listDatas;
+  var { datas } = listDatas;
 
   const currentType = useSelector((state) => state.fileType);
   var { type } = currentType;
@@ -80,7 +86,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb }) =
 
 
   const dataUsers = useSelector((state) => state.auth);
-  var { loading, error, users } = dataUsers;
+  var { users } = dataUsers;
 
 
   const isEditing = (record) => record.id === editingKey;
@@ -91,6 +97,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb }) =
   useEffect(() => {
     dispatch(getListDatas(type, users, parent));
     // console.log('datatable paree type- -', parent,'--', type);
+    sendListRowKeys([]);
   }, [parent]);
 
   useEffect(() => {
@@ -101,6 +108,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb }) =
     setEditingKey("");
     setSelectedRowked([]);
     clearAll();
+    sendListRowKeys([]);
   }, [type]);
   const EditableCell = ({
     editing,
@@ -152,7 +160,6 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb }) =
   const save = async (record) => {
     try {
       const row = await form.validateFields();
-      // console.log(row.name);
       const index = datas.findIndex((item) => record.id === item.id);
       const indexName = datas.findIndex((item) => row.name === item.name && datas[index].extension === item.extension);
       if (indexName !== -1) {
@@ -172,7 +179,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb }) =
   };
   const [filteredInfo, setFilteredInfo] = useState({});
   const [sortedInfo, setSortedInfo] = useState({});
-  const handleChange = (pagination, filters, sorter) => {
+  const handleChange = (_, filters, sorter) => {
     setFilteredInfo(filters);
     setSortedInfo(sorter);
   };
@@ -183,6 +190,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb }) =
   const columns = [
     {
       title: "Loại",
+      className: "type-custom",
       dataIndex: "type",
       render: (_, record) => renderIcon(record.extension),
       filteredValue: filteredInfo && (filteredInfo.type || null),
@@ -193,6 +201,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb }) =
     },
     {
       title: "Tên",
+      className: "name-custom",
       dataIndex: "name",
       editable: true,
       sorter: (a, b) => a.name.length - b.name.length,
