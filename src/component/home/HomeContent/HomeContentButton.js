@@ -3,14 +3,19 @@ import {
 	InfoCircleOutlined,
 	SwapOutlined
 } from '@ant-design/icons';
-import { Button, Input, Layout, message, Modal } from 'antd';
+import { Button, Input, Layout, message, Modal, notification } from 'antd';
+import axios from 'axios';
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { getListDatas } from '../../../actions/rootAction';
 import TreeSelectCustom from './TreeSelectCustom';
 const { Header, Sider } = Layout;
 const { Search } = Input;
 
-const HomeContentButton = ({ listRowKeys }) => {
+const HomeContentButton = ({ listRowKeys, setGiveListKey }) => {
+
+	const listDatas = useSelector((state) => state.file);
+	var { datas } = listDatas;
 	const currentType = useSelector((state) => state.fileType);
 	var { type } = currentType;
 
@@ -51,20 +56,101 @@ const HomeContentButton = ({ listRowKeys }) => {
 		// });
 	};
 
-	const onOk = () => {
-		console.log(ref.current, 'folder select');
+	const onOk = async () => {
+		const folderDestination = ref.current;
+		// localhost:8080/api/user/videos/copy
+		const creator = users.username;
+		let datass = [];
+		listRowKeys.forEach(key => {
+			let ele = datas.find(v => v.id === key);
+			datass.push(ele);
+		});
+		datass = datass.map(v => {
+			return {
+				id: v.id,
+				name: v.name,
+				extension: v.extension
+			}
+		});
+
+		// console.log(datass);
+		// datass = datas.filter(v=>)
+		var config = {
+			method: 'put',
+			url: `http://localhost:8080/api/user/${type}/copy`,
+			headers: {
+				'Authorization': `Bearer ${users.token}`,
+				'Content-Type': 'application/json'
+			},
+			data: {
+				new_parent: folderDestination,
+				creator: creator,
+				datas: datass,
+				type_copy_move: 0
+			}
+		};
+		// console.log(folderDestination);
+		try {
+			const { data } = await axios(config);
+			if (data.msg) {
+				// show popup
+				// console.log(config, 'before');
+				// console.log({ ...config, data: data.data, type_copy_move: 1 }, 'after');
+				Modal.warning({
+					title: data.msg,
+					content:
+						<>
+							<p>Chọn <b>Thao tác</b> hoặc <b>Bỏ qua</b></p>
+							<Button
+								onClick={() => handleClickMore({ ...config, data: { ...data.data, type_copy_move: 1 } })}
+								style={{ marginBottom: 2 }} type="dashed" block>Thay thế file ở thư mục đích
+							 </Button>
+							<Button
+								onClick={() => handleClickMore({ ...config, data: { ...data.data, type_copy_move: 2 } })} //2
+								type="dashed" block>Sao chép với tên "Copy (n)"
+							 </Button>
+						</>,
+					okText: "Bỏ qua",
+					onOk() { },
+				})
+			} else {
+				setGiveListKey([]);
+				notification['success']({
+					message: 'Thông báo',
+					description: 'Sao chép file thành công',
+					duration: 2
+				});
+				dispatch(getListDatas(type, users, parent));
+				ref.current = '';
+			}
+
+		} catch (err) {
+			console.log(err, 'err ne');
+		}
+	}
+	const handleClickMore = async (config) => {
+		try {
+			await axios(config);
+			Modal.destroyAll();
+			notification['success']({
+				message: 'Thông báo',
+				description: 'Sao chép file thành công',
+				duration: 2
+			});
+			setGiveListKey([]);
+			dispatch(getListDatas(type, users, parent));
+			ref.current = '';
+		} catch (err) {
+			console.log(err);
+		}
 	}
 	const onCalcel = () => {
-		console.log('cancle');
-
+		ref.current = '';
 	}
 	const ref = useRef('');
 	const okok = (adu) => {
-		console.log('aduadu', adu);
-		// setFolderSelect(adu);
 		ref.current = adu;
 	}
-	const [folderSelect, setFolderSelect] = useState('');
 	return (
 		<div>
 			<Button onClick={onDownload}
@@ -90,7 +176,7 @@ const HomeContentButton = ({ listRowKeys }) => {
 							setFolderSelect={okok}
 							user={users}
 							type={type}
-							curParent={parent}
+							curParent={''}
 						/>,
 						okText: "Sao chép",
 						cancelText: "Hủy",
@@ -103,10 +189,6 @@ const HomeContentButton = ({ listRowKeys }) => {
 				<CloseCircleFilled />
 				Copy
 			</Button>
-
-
-
-
 			<Button type="default" size="large" style={{ marginRight: '1rem' }}>
 				<SwapOutlined />
 				Move

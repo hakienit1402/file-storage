@@ -30,8 +30,8 @@ const HomeContent = () => {
       dispatch(updateParent(''));
       setListBreadcrumb([]);
     }
-
   }
+  const [giveListKey,setGiveListKey] = useState([]);
   return (
     <>
       <div style={{ margin: "3rem 2rem 0 0" }}>
@@ -41,7 +41,7 @@ const HomeContent = () => {
         />
       </div>
       <div>
-        <HomeContentButton listRowKeys={listRowKeys}
+        <HomeContentButton listRowKeys={listRowKeys} setGiveListKey={setGiveListKey}
         />
       </div>
       <div>
@@ -49,6 +49,7 @@ const HomeContent = () => {
           sendListRowKeys={sendListRowKeys}
           sendListRecords={sendListRecords}
           updateListBreadcrumb={updateListBreadcrumb}
+          giveListRowKeys={giveListKey}
         />
       </div>
     </>

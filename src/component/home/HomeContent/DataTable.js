@@ -1,5 +1,5 @@
 import { EditFilled } from '@ant-design/icons';
-import { Form, Input, message, Table, Typography } from "antd";
+import { Form, Input, message, Table, Tooltip, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { editFileName, getListDatas, updateParent } from "../../../actions/rootAction";
@@ -71,7 +71,7 @@ const videoFilter = [
     value: 'mp4',
   },
 ]
-const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb }) => {
+const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giveListRowKeys }) => {
   const [selectedRowKeys, setSelectedRowked] = useState([]);
   const [editingKey, setEditingKey] = useState("");
 
@@ -92,7 +92,9 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb }) =
   const isEditing = (record) => record.id === editingKey;
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-
+  useEffect(() => {
+    setSelectedRowked(giveListRowKeys);
+  }, [giveListRowKeys]);
 
   useEffect(() => {
     dispatch(getListDatas(type, users, parent));
@@ -207,6 +209,11 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb }) =
       sorter: (a, b) => a.name.length - b.name.length,
       sortOrder: sortedInfo && (sortedInfo.field === 'name' && sortedInfo.order),
       ellipsis: true,
+      render: (_, record) => (
+        <Tooltip placement="top" title={<span>{record.name}</span>}>
+          <span>{record.name}</span>
+        </Tooltip>
+      )
     },
     {
       title: "Kích thước",

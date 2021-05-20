@@ -13,7 +13,6 @@ const TreeSelectCustom = ({ setFolderSelect, user, type, curParent }) => {
             // clean
             setTreeData([]);
             setValue(null);
-            console.log('will unmount');
         }
     }, []);
 
@@ -39,7 +38,6 @@ const TreeSelectCustom = ({ setFolderSelect, user, type, curParent }) => {
                 });
             })
             setTreeData(tree);
-            console.log(tree, 'treeee');
         } catch (err) {
             console.log(err);
         }
@@ -56,7 +54,6 @@ const TreeSelectCustom = ({ setFolderSelect, user, type, curParent }) => {
 
     const onChange = (value, label) => {
         setValue(value);
-        console.log(label[0], 'label');
         setFolderSelect(label[0]);
     };
     return (
