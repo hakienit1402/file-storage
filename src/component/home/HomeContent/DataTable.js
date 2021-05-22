@@ -1,12 +1,17 @@
 import { EditFilled } from '@ant-design/icons';
-import { Form, Input, message, Table, Tooltip, Typography } from "antd";
+import { Form, Image, Input, message, Table, Tooltip, Typography } from "antd";
+import Modal from 'antd/lib/modal/Modal';
 import React, { useEffect, useState } from "react";
+import AudioPlayer from 'react-h5-audio-player';
+import 'react-h5-audio-player/lib/styles.css';
+import ReactPlayer from 'react-player';
 import { useDispatch, useSelector } from "react-redux";
-import { editFileName, getListDatas, updateParent } from "../../../actions/rootAction";
+import { editFileName, getListDatas, getUsedMemory, updateParent } from "../../../actions/rootAction";
 import FolderIcon from "../../../images/folder.png";
 import JpgIcon from "../../../images/jpg.svg";
 import Mp3Icon from "../../../images/mp3.png";
 import Mp4Icon from "../../../images/mp4.png";
+import MusicMainIcon from "../../../images/music-main.png";
 import PngIcon from "../../../images/png.svg";
 import SvgIcon from "../../../images/svg.svg";
 
@@ -29,7 +34,13 @@ const renderIcon = (extension) => {
   }
 };
 
-const renderSize = (size) => (size != 0 ? (size / (1024 * 1024)).toFixed(2) + " MB" : "/");
+const renderSize = (bytes) => {
+  if (bytes === 0) return '/';
+  const k = 1024;
+  const sizes = ['', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
 const pictureFilter = [
   {
     text: 'Thư mục',
@@ -84,11 +95,21 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
   const currenParent = useSelector((state) => state.parent);
   var { parent } = currenParent;
 
+  //
+  const [visible, setVisible] = useState(false);
+  //
 
   const dataUsers = useSelector((state) => state.auth);
   var { users } = dataUsers;
-
-
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    dispatch(getUsedMemory(users.username, users.token));
+    setLoading(true);
+    const time = setTimeout(() => {
+      setLoading(false);
+    }, 300);
+    return () => { clearTimeout(time) }
+  }, [datas]);
   const isEditing = (record) => record.id === editingKey;
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -98,19 +119,30 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
 
   useEffect(() => {
     dispatch(getListDatas(type, users, parent));
-    // console.log('datatable paree type- -', parent,'--', type);
-    sendListRowKeys([]);
   }, [parent]);
 
   useEffect(() => {
-    // console.log('datatable type - ', type);
-    dispatch(getListDatas(type, users, ''));
-    dispatch(updateParent(''));
-    updateListBreadcrumb();
-    setEditingKey("");
+    sendListRowKeys([]);
     setSelectedRowked([]);
     clearAll();
-    sendListRowKeys([]);
+    setEditingKey("");
+  }, [parent, type]);
+
+  useEffect(() => {
+    if (type !== 'shared' && type !== 'trash') {
+      dispatch(getListDatas(type, users, ''));
+      dispatch(updateParent(''));
+      updateListBreadcrumb();
+    } else {
+      if (type === 'shared') {
+        console.log('lo~ shared');
+        // column
+        // data
+      } else {
+        console.log('lo~ trash');
+      }
+    }
+
   }, [type]);
   const EditableCell = ({
     editing,
@@ -283,9 +315,112 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
     onChange: onSelectChange,
     hideDefaultSelections: true,
   };
+
+  const handlePlay = (rc) => {
+    const extension = rc.extension;
+    const src = rc.file_sk + '.' + rc.extension;
+    if (extension.includes('mp')) {
+      const title = rc.name;
+      if (extension === 'mp4') {
+        setIsVideoPlaying(true);
+        setSrcVideo(src);
+        setTitleVideo(title);
+      } else { // mp3
+        setIsVideoPlaying(false);
+        setSrcAudio(src);
+        setTitleAudio(title);
+        // console.log(src);
+      }
+      setVisible(true);
+    } else {
+      setSrcImage(src);
+      setPreview(true);
+    }
+
+
+  }
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [srcVideo, setSrcVideo] = useState('');
+  const [titleVideo, setTitleVideo] = useState('');
+
+  const [srcAudio, setSrcAudio] = useState('');
+  const [titleAudio, setTitleAudio] = useState('');
+
+  const [srcImage, setSrcImage] = useState('');
+
+  const handleCancel = () => {
+    setVisible(false);
+    if (isVideoPlaying) {
+      var videoElement = document.getElementsByTagName('video');
+      videoElement[0].pause();
+      videoElement[0].src = '';
+      videoElement[0].load();
+      setSrcVideo('');
+    } else {
+      var videoElement = document.getElementsByTagName('audio');
+      videoElement[0].pause();
+      videoElement[0].src = '';
+      videoElement[0].load();
+      setSrcAudio('');
+    }
+  }
+  const handlePauseAudio = (cut) => {
+    document.getElementById('img-audio').style.webkitAnimationPlayState = cut;
+  }
+  const [preview, setPreview] = useState(false);
   return (
-    <div>
+    <div >
+      <Image
+       placeholder={
+        <Image
+          preview={false}
+          src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png?x-oss-process=image/blur,r_50,s_50/quality,q_1/resize,m_mfit,h_200,w_200"
+          width={0}
+        />
+      }
+        preview={{
+          visible: preview,
+          onVisibleChange: () => { setPreview(false); setSrcImage('') },
+          src: `http://127.0.0.1:6969/Pictures/${srcImage}`,
+        }}
+      />
+      <Modal
+        className='model-custom'
+        title={titleVideo}
+        centered
+        visible={visible}
+        onCancel={() => { handleCancel() }}
+        footer={null}
+      >
+        {isVideoPlaying ?
+          <ReactPlayer
+            height='fit-content'
+            url={`http://127.0.0.1:6969/Videos/${srcVideo}`}
+            // loop
+            stopOnUnmount={true}
+            playing={true}
+            controls={true}
+            volume={1}
+            muted={true}
+          /> :
+          <div style={{ width: 500 }}>
+            <h5>{titleAudio}</h5>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '15px 0' }}>
+              <img id='img-audio' src={MusicMainIcon} alt="" width='150' height='150' />
+            </div>
+            <hr />
+            <AudioPlayer
+              autoPlay
+              onPause={() => { handlePauseAudio('paused'); }}
+              onPlay={() => { handlePauseAudio('running') }}
+              src={'http://127.0.0.1:6969/Musics/' + srcAudio}
+            />
+          </div>
+
+        }
+      </Modal>
       <Table
+        loading={loading}
         onChange={handleChange}
         rowSelection={rowSelection}
         components={{
@@ -304,7 +439,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
                 dispatch(updateParent(record.name));
                 updateListBreadcrumb(record.name)
               } else {
-                alert('PLAYYYY');
+                handlePlay(record);
               }
             }
           }

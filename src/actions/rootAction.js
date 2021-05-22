@@ -4,12 +4,8 @@ import {
     GET_CURRENT,
     GET_LIST,
     GET_LIST_SUCCESS,
-
     GET_PARENT,
-
-    POST_DELETE_MUSIC,
-    POST_DELETE_MUSIC_FAIL,
-
+    GET_USED_MEMORY,
     UPDATE_STORE_TMP
 } from "./type";
 
@@ -21,7 +17,6 @@ export const updateParent = (parent) => (dispatch) => {
 }
 
 const HEAD_URI = "http://localhost:8080/api/user";
-// const data = JSON.parse(localStorage.getItem('data'));
 // type: musics, pictures, videos
 export const getListDatas = (typeFile, data, parent) => (dispatch) => {
     try {
@@ -34,19 +29,15 @@ export const getListDatas = (typeFile, data, parent) => (dispatch) => {
                 'Authorization': `Bearer ${data.token}`
             }
         };
-        // console.log(data);
         axios(config)
             .then((res) => {
                 var data = res.data;
-                // console.log(data);
                 data.sort((a, b) => { return new Date(b.modifyDate) - new Date(a.modifyDate) });
                 dispatch({ type: GET_LIST_SUCCESS, payload: data });
             }).catch(() => {
                 dispatch({ type: LOGOUT });
-                console.log('err1');
             });
     } catch (error) {
-        console.log('err2');
         dispatch({ type: LOGOUT });
     }
 };
@@ -129,5 +120,34 @@ export const deleteMusicItem = (listkey) => (dispatch) => {
     //     dispatch({ type: POST_DELETE_MUSIC_FAIL, payload: error.message });
     // }
 };
+
+//
+export const getUsedMemory = (creator, token) => (dispatch) => {
+    var config = {
+        method: 'get',
+        url: `${HEAD_URI}/${creator}`,
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        }
+    };
+    try {
+        axios(config)
+            .then((res) => {
+                dispatch({ type: GET_USED_MEMORY, payload: res.data });
+            }).catch(err => {
+                console.log(err);
+            })
+    } catch (err) {
+        console.log(err);
+    }
+
+}
+// export const formatBytes = (bytes) => {
+//     if (bytes === 0) return '0 B';
+//     const k = 1024;
+//     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+//     const i = Math.floor(Math.log(bytes) / Math.log(k));
+//     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+// }
 
 

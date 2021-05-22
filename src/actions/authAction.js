@@ -19,7 +19,7 @@ export const login = (username, password) => (dispatch) => {
             dispatch({ type: GET_PARENT, payload: '' });
             dispatch({ type: GET_CURRENT, payload: 'pictures' });
         })
-        .catch((err) => {
+        .catch(() => {
             dispatch({ type: LOGIN_FAIL, payload: "Tài khoản hoặc mật khẩu không chính xác" });
         }
         )
@@ -45,6 +45,7 @@ export const logout = () => (dispatch) => {
     dispatch({ type: GET_CURRENT });
     dispatch({ type: GET_PARENT });
 }
+
 export const checkOTP = (otp) => (dispatch) => {
     axios
         .post(

@@ -36,14 +36,6 @@ body {
   font-family: 'Roboto2';
   src: local('Roboto'), url(./fonts/Roboto/Roboto-Medium.ttf) format('truetype');
 }
-/* #dm{
-       width: 100%; 
-      height: 100vh;
-      position: absolute;
-      /* background-color: aquamarine; */
-      /* background-image: url('./images/fileStorage.png');
-      z-index: 999;  */
-/* } */ */
 /* code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
@@ -53,3 +45,18 @@ body {
   top: 100%;
   font-size: 12px;
 }
+hr{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.model-custom .ant-modal-content{
+  width: fit-content !important;
+}
+.rhap_container {
+  box-shadow: none !important;
+}
+#img-audio{
+  overflow: hidden;
+  animation:spin 4s linear infinite;
+}
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }

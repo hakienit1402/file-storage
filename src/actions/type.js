@@ -21,3 +21,6 @@ export const UPDATE_STORE_TMP = 'UPDATE_STORE_TMP';
 
 export const GET_CURRENT = 'GET_CURRENT';
 export const GET_PARENT = 'GET_PARENT';
+
+//
+export const GET_USED_MEMORY = 'GET_USED_MEMORY';

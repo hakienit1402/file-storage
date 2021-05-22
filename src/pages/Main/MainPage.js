@@ -13,17 +13,15 @@ const MainPage = () => {
 	const currentType = useSelector((state) => state.fileType);
 	var { type } = currentType;
 
-	const [active, setActive] = useState(type || 'pictures');
-	const clickHandler = (currType) => {
-		setActive(currType);
-	};
 	return (
 		<div>
 			<Header />
 			<Layout>
 				<Layout>
 					<Sider width={250} style={{ background: '#fff' }}>
-						<Slider clickHandler={clickHandler} type={active} />
+						<Slider 
+						// clickHandler={clickHandler} 
+						type={type||'pictures'} />
 					</Sider>
 					<Layout
 						style={{

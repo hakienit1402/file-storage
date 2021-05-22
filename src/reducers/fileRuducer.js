@@ -4,7 +4,8 @@ import {
   GET_CURRENT,
   GET_LIST_SUCCESS,
   UPDATE_STORE_TMP,
-  GET_PARENT
+  GET_PARENT,
+  GET_USED_MEMORY
 } from "../actions/type";
 
 export const fileReducer = (
@@ -38,5 +39,11 @@ export const parentReducer = (state = {}, action) => {
     return state;
   }
 }
-// export default fileReducer;
-// export default fileTypeReducer;
+
+export const usedMemoryReducer = (state = {}, action) => {
+  if (action.type === GET_USED_MEMORY) {
+    return { memory: action.payload };
+  } else {
+    return state;
+  }
+}

@@ -1,6 +1,8 @@
+import { FolderAddFilled } from '@ant-design/icons';
 import Button from '@material-ui/core/Button';
 import { Input, Modal, notification, Progress, Spin, Upload } from 'antd';
-import { useRef } from 'react';
+import axios from 'axios';
+import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getListDatas } from '../../actions/rootAction';
 import PlusIcon from "../../images/plus.png";
@@ -10,8 +12,9 @@ const pictureAccept = ".png, .jpeg, .jpg, .svg";
 const videoAccept = ".mp4";
 const audioAccept = ".mp3";
 const SliderFormUpload = () => {
-	// const [visible, setVisible] = useState(false);
-	// const dispatch = useDispatch();
+	const [visible, setVisible] = useState(false);
+	const [value, setValue] = useState('');
+	const [nameInValid, setNameInValid] = useState(null);
 	const data = useSelector((state) => state.auth);
 	const { users } = data;
 
@@ -22,15 +25,46 @@ const SliderFormUpload = () => {
 	const { parent } = currenParent;
 
 	const showModal = () => {
-		// setVisible(true);
+		setVisible(true);
 	};
 
-	const handleOk = () => {
-		// setVisible(false);
+	const handleOk = async () => {
+		if (value == '') {
+			setNameInValid('*Vui lòng nhập tên thư mục!');
+			return;
+		}
+		var config = {
+			method: 'post',
+			url: `http://localhost:8080/api/user/${type}`,
+			headers: {
+				'Authorization': `Bearer ${users.token}`,
+				'Content-Type': 'application/json'
+			},
+			data: {
+				"name": value,
+				"parent": parent,
+				"creator": users.username
+			}
+		};
+		try {
+			await axios(config);
+			setVisible(false);
+			setNameInValid(null);
+			setValue('');
+			notification['success']({
+				message: 'Thông báo',
+				description: 'Tạo thư mục thành công',
+				duration: 2
+			});
+			dispatch(getListDatas(type, users, parent));
+		} catch (err) {
+			setNameInValid('*Tên thư mục đã tồn tại!');
+		}
 	};
 
 	const handleCancel = () => {
-		// setVisible(false);
+		setVisible(false);
+		setNameInValid(null);
 	};
 
 
@@ -51,7 +85,7 @@ const SliderFormUpload = () => {
 			icon: <Spin />,
 			key,
 			placement: "bottomRight",
-			duration:1
+			duration: 1
 		});
 	};
 	const dispatch = useDispatch();
@@ -71,7 +105,7 @@ const SliderFormUpload = () => {
 			// console.log(name);
 			openNotification(name, 0, uid);
 		},
-		onSuccess: (_, { uid }) => {
+		onSuccess: () => {
 			if (timeOut.current)
 				clearTimeout(timeOut.current);
 			timeOut.current = setTimeout(() => {
@@ -106,7 +140,6 @@ const SliderFormUpload = () => {
 				<Button
 					className='btn-up-new'
 					variant="contained"
-
 					startIcon={
 						<img src={PlusIcon} width='30' height='30' />
 					}
@@ -115,40 +148,20 @@ const SliderFormUpload = () => {
 					Thư mục mới
 				</Button>
 				<Modal
+					width={300}
+					visible={visible}
 					title="Thư mục mới"
-					// visible={visible}
+					okText='Tạo'
+					cancelText='Đóng'
 					onOk={() => handleOk()}
 					onCancel={() => handleCancel()}
 				>
-					<Input placeholder="Tiêu đề thư mục" />
+					<Input
+						prefix={<FolderAddFilled style={{ color: '#525252' }} />}
+						allowClear
+						placeholder="Tên thư mục" value={value} onChange={(e) => { setValue(e.target.value); setNameInValid(null) }} />
+					{nameInValid && <span style={{ color: '#dc2020', position: 'absolute', right: 25, fontSize: 12, display: 'block' }}>{nameInValid}</span>}
 				</Modal>
-
-				{/* <Modal
-				width={300}
-					visible={true}
-					title="Thư mục hiện tại có 2 tập tin trùng tên"
-					onCancel={() => { }}
-					footer={[
-						<Button onClick={() => { } }>
-							Return
-            			</Button>
-					]}
-				>
-					<div>
-						<Button
-							onClick={() => { } }
-						>
-							Submit
-            			</Button>
-					</div>
-					<div>
-						<Button
-							onClick={() => { } }
-						>
-							Search on Google
-            			</Button>
-					</div>
-				</Modal> */}
 			</div>
 		</div>
 	);

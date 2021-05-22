@@ -1,11 +1,12 @@
 import {
 	CloseCircleFilled, DownloadOutlined,
 	InfoCircleOutlined,
-	SwapOutlined
+	SwapOutlined,
+	UserAddOutlined
 } from '@ant-design/icons';
 import { Button, Input, Layout, message, Modal, notification } from 'antd';
 import axios from 'axios';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getListDatas } from '../../../actions/rootAction';
 import TreeSelectCustom from './TreeSelectCustom';
@@ -152,13 +153,14 @@ const HomeContentButton = ({ listRowKeys, setGiveListKey }) => {
 		ref.current = adu;
 	}
 	return (
-		<div>
-			<Button onClick={onDownload}
+		<div style={{marginBottom:10}}>
+			<Button disabled={listRowKeys.length === 0}
+				onClick={onDownload}
 				type="default" size="large" style={{ marginRight: '1rem' }}>
 				<DownloadOutlined />
 				Download
 			</Button>
-			<Button
+			<Button disabled={listRowKeys.length === 0}
 				type="default"
 				size="large"
 				style={{ marginRight: '1rem' }}
@@ -167,31 +169,38 @@ const HomeContentButton = ({ listRowKeys, setGiveListKey }) => {
 				<CloseCircleFilled />
 				Delete
 			</Button>
-			<Button onClick={() => {
-				listRowKeys.length === 0 ?
-					message.warning('Vui lòng chọn ít nhất 1 file') :
-					Modal.confirm({
-						title: "Chọn thư mục",
-						content: <TreeSelectCustom
-							setFolderSelect={okok}
-							user={users}
-							type={type}
-							curParent={''}
-						/>,
-						okText: "Sao chép",
-						cancelText: "Hủy",
-						icon: <InfoCircleOutlined style={{ color: '#0e9c82' }} />,
-						onOk() { onOk() },
-						// onCalcel() { console.log("ca"); }
-					});
-			}}
+			<Button disabled={listRowKeys.length === 0}
+				onClick={() => {
+					listRowKeys.length === 0 ?
+						message.warning('Vui lòng chọn ít nhất 1 file') :
+						Modal.confirm({
+							title: "Chọn thư mục",
+							content: <TreeSelectCustom
+								setFolderSelect={okok}
+								user={users}
+								type={type}
+								curParent={''}
+							/>,
+							okText: "Sao chép",
+							cancelText: "Hủy",
+							icon: <InfoCircleOutlined style={{ color: '#0e9c82' }} />,
+							onOk() { onOk() },
+							// onCalcel() { console.log("ca"); }
+						});
+				}}
 				type="default" size="large" style={{ marginRight: '1rem' }}>
 				<CloseCircleFilled />
 				Copy
 			</Button>
-			<Button type="default" size="large" style={{ marginRight: '1rem' }}>
+			<Button disabled={listRowKeys.length === 0}
+				type="default" size="large" style={{ marginRight: '1rem' }}>
 				<SwapOutlined />
 				Move
+			</Button>
+			<Button disabled={listRowKeys.length === 0}
+				icon={<UserAddOutlined />}
+				type="default" size="large" style={{ marginRight: '1rem' }}>
+				Chia sẻ
 			</Button>
 		</div>
 	);
