@@ -85,7 +85,7 @@ const SliderFormUpload = () => {
 			icon: <Spin />,
 			key,
 			placement: "bottomRight",
-			duration: 1
+			duration: null
 		});
 	};
 	const dispatch = useDispatch();
@@ -105,7 +105,11 @@ const SliderFormUpload = () => {
 			// console.log(name);
 			openNotification(name, 0, uid);
 		},
-		onSuccess: () => {
+		onSuccess: (_, { uid }) => {
+			setTimeout(() => {
+				notification.close(uid);
+			}, 500)
+
 			if (timeOut.current)
 				clearTimeout(timeOut.current);
 			timeOut.current = setTimeout(() => {
@@ -121,11 +125,13 @@ const SliderFormUpload = () => {
 		<div>
 			<div style={{ margin: '3rem 0 1rem 15px' }}>
 				<Upload {...props}
+					disabled={type === 'trash'}
 					multiple
 					accept={type === 'pictures' ? pictureAccept : type === 'videos' ? videoAccept : audioAccept}
 					showUploadList={false}
 				>
 					<Button
+					disabled={type === 'trash'}
 						className='btn-up-new'
 						variant="contained"
 						startIcon={
@@ -138,6 +144,7 @@ const SliderFormUpload = () => {
 			</div>
 			<div style={{ margin: '2rem 0 1rem 15px' }}>
 				<Button
+					disabled={type === 'trash'}
 					className='btn-up-new'
 					variant="contained"
 					startIcon={

@@ -2,17 +2,17 @@ import React, { lazy, Suspense } from 'react';
 import { useSelector } from 'react-redux';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import './App.css';
+import ReturnVNPay from './pages/Payment/ReturnVNPay';
+const Upgrade = lazy(() => import('./pages/account/Upgrade'));
 const SignIn = lazy(() => import('./pages/Auth0/SignIn'));
 const SignUp = lazy(() => import('./pages/Auth0/SignUp'));
-// const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
 const MainPage = lazy(() => import('./pages/Main/MainPage'));
 
 const App = () => {
 	const data = useSelector((state) => state.auth);
-	const { loading, error, users } = data;
+	const { users } = data;
 
 	function PrivateRoute({ children, ...rest }) {
-		// let auth = useAuth();
 		return (
 			<Route
 				{...rest}
@@ -26,6 +26,7 @@ const App = () => {
 								state: { from: location }
 							}}
 						/>
+						// <Redirect to='/signin' />
 					)
 				}
 			/>
@@ -38,13 +39,6 @@ const App = () => {
 			<Router>
 				<div>
 					<Suspense fallback={<div>Loading...</div>}>
-						{/* <Redirect
-				to={{
-					pathname: "/main",
-					state: { from: location }
-				}}
-			/> */}
-						{/* <Header/> */}
 						<Switch>
 							<Route path="/" exact={true}>
 								<SignIn />
@@ -56,15 +50,17 @@ const App = () => {
 								<MainPage />
 							</PrivateRoute>
 
-							{/* <Route path="/main" exact={true}>
-								<MainPage />
-							</Route> */}
 							<Route path="/signup" >
 								<SignUp />
 							</Route>
-							<Route path="*">
-								<SignIn />
+							<Route path="/returnvnpay" >
+								<ReturnVNPay />
 							</Route>
+							<PrivateRoute
+								// exact={true}
+								path="/upgrade"
+								component={Upgrade}
+							/>
 						</Switch>
 					</Suspense>
 				</div>

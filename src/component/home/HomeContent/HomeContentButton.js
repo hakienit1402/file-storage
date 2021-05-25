@@ -4,17 +4,19 @@ import {
 	SwapOutlined,
 	UserAddOutlined
 } from '@ant-design/icons';
-import { Button, Input, Layout, message, Modal, notification } from 'antd';
+import { HistoryOutlined } from '@material-ui/icons';
+import { Button, message, Modal, notification } from 'antd';
 import axios from 'axios';
 import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getListDatas } from '../../../actions/rootAction';
+import { getListDatas, moveToTrash, restoreItem } from '../../../actions/rootAction';
 import TreeSelectCustom from './TreeSelectCustom';
-const { Header, Sider } = Layout;
-const { Search } = Input;
+// const { Header, Sider } = Layout;
+// const { Search } = Input;
 
 const HomeContentButton = ({ listRowKeys, setGiveListKey }) => {
 
+	const dispatch = useDispatch();
 	const listDatas = useSelector((state) => state.file);
 	var { datas } = listDatas;
 	const currentType = useSelector((state) => state.fileType);
@@ -28,17 +30,8 @@ const HomeContentButton = ({ listRowKeys, setGiveListKey }) => {
 	var { users } = dataUsers;
 
 
-	// const selectedRowKeys = props.selectedRowKeys;
-	const dispatch = useDispatch()
-	// useEffect(() => {
-	// 	deleteMusicItem(selectedRowKeys);
-	// }, [selectedRowKeys]);
-
 	const handleDelete = () => {
-		console.log(listRowKeys, 'home content button');
-		// console.log('selectedRowKeys changed: ' + selectedRowKeys);
-		// deleteMusicItem();
-		// dispatch(deleteMusicItem(listRowKeys))
+		dispatch(moveToTrash(listRowKeys, datas, users.username, users.token, type));
 	};
 
 	const onDownload = () => {
@@ -152,13 +145,20 @@ const HomeContentButton = ({ listRowKeys, setGiveListKey }) => {
 	const okok = (adu) => {
 		ref.current = adu;
 	}
-	return (
-		<div style={{marginBottom:10}}>
+	const handleDeleteVV = () => {
+
+	}
+	const handleRestore = () => {
+		dispatch(restoreItem(listRowKeys, datas, users.username, users.token))
+		// listRowKeys
+	}
+	return type !== 'trash' ?
+		(<div style={{ marginBottom: 10 }}>
 			<Button disabled={listRowKeys.length === 0}
 				onClick={onDownload}
 				type="default" size="large" style={{ marginRight: '1rem' }}>
 				<DownloadOutlined />
-				Download
+				Tải xuống
 			</Button>
 			<Button disabled={listRowKeys.length === 0}
 				type="default"
@@ -167,7 +167,7 @@ const HomeContentButton = ({ listRowKeys, setGiveListKey }) => {
 				onClick={handleDelete}
 			>
 				<CloseCircleFilled />
-				Delete
+				Xóa
 			</Button>
 			<Button disabled={listRowKeys.length === 0}
 				onClick={() => {
@@ -190,19 +190,36 @@ const HomeContentButton = ({ listRowKeys, setGiveListKey }) => {
 				}}
 				type="default" size="large" style={{ marginRight: '1rem' }}>
 				<CloseCircleFilled />
-				Copy
+				Sao chép
 			</Button>
 			<Button disabled={listRowKeys.length === 0}
 				type="default" size="large" style={{ marginRight: '1rem' }}>
 				<SwapOutlined />
-				Move
+				Di chuyển
 			</Button>
 			<Button disabled={listRowKeys.length === 0}
 				icon={<UserAddOutlined />}
 				type="default" size="large" style={{ marginRight: '1rem' }}>
 				Chia sẻ
 			</Button>
-		</div>
-	);
+		</div>)
+		:
+		(<div style={{ marginBottom: 10 }}>
+			<Button icon={<HistoryOutlined style={{ fontSize: 20, margin: '-3px 1px' }} />}
+				disabled={listRowKeys.length === 0}
+				onClick={() => { handleRestore() }}
+				type="default" size="large" style={{ marginRight: '1rem' }}>
+				Khôi phục
+			</Button>
+			<Button disabled={listRowKeys.length === 0}
+				type="default"
+				size="large"
+				style={{ marginRight: '1rem' }}
+				onClick={() => { handleDeleteVV() }}
+			>
+				<CloseCircleFilled />
+				Xóa vĩnh viễn
+			</Button>
+		</div>);
 };
 export default HomeContentButton;

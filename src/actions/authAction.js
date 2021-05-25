@@ -7,6 +7,28 @@ import {
 } from "../constants/authConstants";
 import { GET_CURRENT, GET_PARENT } from "./type";
 const HEAD_URI = "http://localhost:8080/api";
+export const updateTotalMemory = (price, user) => (dispatch) => {
+    let config = {
+        method: 'get',
+        url: `${HEAD_URI}/user/total/${price}`,
+        headers: {
+            'Authorization': `Bearer ${user.token}`,
+        }
+    };
+    try {
+        axios(config)
+            .then((res) => {
+                console.log(res, 'sizeee');
+                user.acc_pkg_size = res.data;
+                dispatch({ type: LOGIN_SUCCESS, payload: user });
+            }).catch(er=>{
+                console.log(er);
+            })
+    } catch (err) {
+        console.log(err);
+    }
+
+}
 export const login = (username, password) => (dispatch) => {
     // dispatch({ type: LOGIN_REQUEST, payload: { username, password } })
     axios

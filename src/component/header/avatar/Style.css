@@ -2,41 +2,8 @@
 	margin-right: 25px;
 	margin-top: 15px;
 }
-.avatar-group-notifi-detail {
-	display: block;
-	position: fixed;
-	/* white-space: nowrap;
-	float: none; */
-	top: 60px;
-	overflow: hidden;
-	/* margin-top: 4px; */
-	/* left: 0; Nằm sát bên trái */
-
-	z-index: 100000; /*Hiển thị lớp trên cùng*/
-}
 .avatar-group-button-user {
-	background-color: white;
-	display: block;
-	position: fixed;
-	right: 10px;
-	top: 10vh;
 	justify-content: center;
-	flex-direction: column;
-	text-align: center;
-	margin: auto;
-	/* bottom: 10vh;
-	left: 7px;
-	z-index: 9999; */
-}
-.user-dropdown-button {
-	/* position: absolute;
-	top: 7px;
-	right: 0;
-	bottom: 7px;
-	left: 7px;
-	z-index: 9999;
-	opacity: 0.0001;
-	content: ' '; */
 }
 .user-dropdown-button-img-avatar {
 	width: 40px;

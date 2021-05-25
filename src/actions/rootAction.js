@@ -18,13 +18,16 @@ export const updateParent = (parent) => (dispatch) => {
 
 const HEAD_URI = "http://localhost:8080/api/user";
 // type: musics, pictures, videos
-export const getListDatas = (typeFile, data, parent) => (dispatch) => {
+export const getListDatas = (typeFile, data, parent, state = 1) => (dispatch) => {
+    // console.log('state', state);
+    let url = typeFile !== 'trash' ? `${HEAD_URI}/${typeFile}/${state}/${data.username}/${parent}`
+        : `${HEAD_URI}/${typeFile}/${data.username}`;
     try {
         dispatch({ type: GET_LIST });
-
-        var config = {
+        let config = {
             method: 'get',
-            url: `${HEAD_URI}/${typeFile}/${data.username}/${parent}`,
+            // url: `${HEAD_URI}/${typeFile}/${state}/${data.username}/${parent}`,
+            url: url,
             headers: {
                 'Authorization': `Bearer ${data.token}`
             }
@@ -67,7 +70,7 @@ export const editFileName = (datas, new_name, index, typeFile, token) => (dispat
 
     // dispatch({ type: POST_EDIT_MUSIC });
 
-    var config = {
+    let config = {
         method: 'put',
         url: `${HEAD_URI}/${typeFile}/name`,
         headers: {
@@ -87,40 +90,88 @@ export const editFileName = (datas, new_name, index, typeFile, token) => (dispat
             // console.log(error);
         });
 };
-export const deleteMusicItem = (listkey) => (dispatch) => {
-    console.log(listkey, 'root action');
-    // id, [name, extension], state, creator ->>>> trash, untrash
+export const moveToTrash = (listIds, listDatas, creator, token, type) => (dispatch) => {
+    var datas = listDatas.filter(f => listIds.includes(f.id)).map(f => {
+        return {
+            id: f.id,
+            name: f.name,
+            extension: f.extension
+        }
+    });
+    let dataRequest = {
+        creator: creator,
+        state: 0,
+        datas: datas
+    }
+    const config = {
+        method: 'put',
+        url: `${HEAD_URI}/${type}/trash`,
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        data: dataRequest
+    }
+    try {
+        // console.log('ok');
+        axios(config).then(() => {
+            let list = listDatas.filter(f => !listIds.includes(f.id));
+            // console.log(list);
+            dispatch({ type: GET_LIST_SUCCESS, payload: list });
+        });
+    } catch (err) {
+        console.log(err);
+    }
+    // console.log(dataRequest);
 
-    // const bodyData = {
-    //     id: datas[index].id,
-    //     new_name: new_name,
-    //     old_name: oldName,
-    //     cur_parent: datas[index].parent,
-    //     extension: datas[index].extension,
-    //     creator: datas[index].creator
-    // }
-    // try {
-    // dispatch({ type: POST_DELETE_MUSIC });
-    // let dataAlterDelete = [...musics]
-    // console.log(dataAlterDelete)
-    // console.log(data);
-    // const dataDelete = data.filter(	res.data =>
-    // 	data
-    // );
-
-    // axios
-    // 	.post(
-    // 		'https://file-storage-2021.herokuapp.com/musics/deletemussic',
-    // data
-    // 	)
-    // 	.then((res) => {
-    // dispatch({ type: POST_DELETE_MUSIC_SUCCESS, payload: res.data });
-    // });
-    // } catch (error) {
-    //     dispatch({ type: POST_DELETE_MUSIC_FAIL, payload: error.message });
-    // }
 };
 
+export const restoreItem = (listId, listDatas, creator, token) => (dispatch) => {
+    let dataPictures = [];
+    let dataVideos = [];
+    let dataMusics = [];
+    // lọc ra theo nhóm: videos, musics, pictures
+    listDatas.filter(f => listId.includes(f.id))
+        .map(f => {
+            if (f.parent === 'videos')
+                dataVideos.push({ id: f.id, name: f.name, extension: f.extension })
+            else if (f.parent === 'pictures')
+                dataPictures.push({ id: f.id, name: f.name, extension: f.extension })
+            else
+                dataMusics.push({ id: f.id, name: f.name, extension: f.extension })
+        });
+
+    const dataRequest = {
+        creator: creator,
+        state: 1,
+        datas: null
+    }
+    const config = {
+        method: 'put',
+        url: null,
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        data: null
+    }
+    try {
+        if (dataPictures.length !== 0)
+            axios({ ...config, url: `${HEAD_URI}/pictures/trash`, data: { ...dataRequest, datas: dataPictures } });
+        if (dataVideos.length !== 0)
+            axios({ ...config, url: `${HEAD_URI}/videos/trash`, data: { ...dataRequest, datas: dataVideos } });
+        if (dataMusics.length !== 0)
+            axios({ ...config, url: `${HEAD_URI}/musics/trash`, data: { ...dataRequest, datas: dataMusics } });
+
+        const list = listDatas.filter(f => !listId.includes(f.id));
+        // console.log(list);
+        dispatch({ type: GET_LIST_SUCCESS, payload: list });
+
+    } catch (err) { console.log(err); }
+    // console.log(dataPictures, 'pic');
+    // console.log(dataVideos, 'video');
+    // console.log(dataMusics, 'music');
+}
 //
 export const getUsedMemory = (creator, token) => (dispatch) => {
     var config = {

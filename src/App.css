@@ -4,7 +4,6 @@
     font-size: 13px;
   }
 body{
-    
     padding: 0;
     margin: 0;
     box-sizing: border-box;
@@ -40,5 +39,53 @@ body{
     width: 400px;
   }
 
-  
-  
+  .MuiPaper-elevation1{
+    box-shadow: 0 1px 6px rgb(60 64 67 / 30%) !important;
+
+  }
+  .MuiPaper-rounded{
+    border-radius: 8px !important;
+  }
+  #OK{
+    background: linear-gradient(
+      90deg
+      ,#34a853 4%,#4285f4 0%) top/100% 34% no-repeat,linear-gradient(
+      90deg
+      ,#fbbc04 50%,#4285f4 0%) top/100% 82% no-repeat,linear-gradient(
+      70deg
+      ,#fbbc04 10%,#ea4335 0%) top/100% 100% !important;
+          padding: 5px !important;
+  }
+  .sdlfj{
+    padding: 0 15px;
+  }
+  .MuiListItemIcon-root{
+    min-width: 35px !important;
+  }
+  .MuiContainer-maxWidthMd{
+    max-width: 900px !important;
+  }
+
+  .icon-shared{
+    /* display: block; */
+    position: absolute;
+    color: #b70818c2 !important;
+    font-size: 18px;
+    left: -17px;
+    top: -10px;
+    transition: 0.3s ease-in;
+  }
+  .icon-shared:hover{
+    color: #29e7cec2 !important;
+  }
+  .list-shared .ant-list-item{
+    padding: 5px 0 !important;
+  }
+  .list-shared .delete-shared{
+    cursor: pointer;
+  }
+  .list-shared .delete-shared:hover,.delete-shared:hover .title-shared {
+    color: #bd2214;
+    transition: 0.2s ease-in;
+  }
+  /* title-shared */

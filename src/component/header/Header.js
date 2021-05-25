@@ -17,6 +17,7 @@ export class Header extends Component {
           <Col span={5} style={{}}>
             <Link to="/">
               <Image
+                preview={false}
                 src={logo}
                 style={{
                   width: "130px",

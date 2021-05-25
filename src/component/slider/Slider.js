@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 import { updateType } from '../../actions/rootAction';
 import SliderFormUpload from './SliderFormUpload';
 const Slider = ({ type }) => {
-// const Slider = ({ clickHandler, type }) => {
+	// const Slider = ({ clickHandler, type }) => {
 	const dataUsers = useSelector((state) => state.auth);
 	var { users } = dataUsers;
 
@@ -27,7 +27,7 @@ const Slider = ({ type }) => {
 		// clickHandler(e.key);
 		dispatch(updateType(e.key));
 		setCurrentType(e.key);
-		console.log(e.key);
+		// console.log(e.key);
 	}
 
 	const formatBytes = (bytes) => {
@@ -102,7 +102,7 @@ const Slider = ({ type }) => {
 							to: '#87d068',
 						}}
 						size="small"
-						percent={Math.round((memory/users.acc_pkg_size)*100)}
+						percent={Math.round((memory / users.acc_pkg_size) * 100)}
 						status="active"
 					/>
 					<span
@@ -111,7 +111,9 @@ const Slider = ({ type }) => {
 					</span>
 
 				</div>
-				<Button style={{ display: 'block', margin: 'auto', fontWeight: 500, color: '#028888' }} shape="round">Mua bộ nhớ</Button>
+				<Button
+					href="/upgrade"
+					style={{ display: 'block', margin: 'auto', fontWeight: 500, color: '#028888',width:'fit-content' }} shape="round">Mua bộ nhớ</Button>
 			</div>
 		</div>
 	);

@@ -1,19 +1,22 @@
-import { EditFilled } from '@ant-design/icons';
-import { Form, Image, Input, message, Table, Tooltip, Typography } from "antd";
+import { EditFilled, HistoryOutlined, TeamOutlined } from '@ant-design/icons';
+import { Form, Image, Input, message, Popover, Table, Tooltip, Typography } from "antd";
 import Modal from 'antd/lib/modal/Modal';
 import React, { useEffect, useState } from "react";
 import AudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 import ReactPlayer from 'react-player';
 import { useDispatch, useSelector } from "react-redux";
-import { editFileName, getListDatas, getUsedMemory, updateParent } from "../../../actions/rootAction";
+import { editFileName, getListDatas, getUsedMemory, restoreItem, updateParent } from "../../../actions/rootAction";
 import FolderIcon from "../../../images/folder.png";
 import JpgIcon from "../../../images/jpg.svg";
 import Mp3Icon from "../../../images/mp3.png";
 import Mp4Icon from "../../../images/mp4.png";
 import MusicMainIcon from "../../../images/music-main.png";
+import PictureMainIcon from "../../../images/picture.png";
 import PngIcon from "../../../images/png.svg";
 import SvgIcon from "../../../images/svg.svg";
+import VideoMainIcon from "../../../images/video-main.png";
+import SharedComponent from './SharedComponent';
 
 const renderIcon = (extension) => {
   switch (extension) {
@@ -33,6 +36,16 @@ const renderIcon = (extension) => {
       break;
   }
 };
+const renderKind = (kind) => {
+  switch (kind) {
+    case "videos":
+      return <img className="img-type" alt="#" src={VideoMainIcon} />;
+    case "musics":
+      return <img className="img-type" alt="#" src={MusicMainIcon} />;
+    default: // picture
+      return <img className="img-type" alt="#" src={PictureMainIcon} />;
+  }
+}
 
 const renderSize = (bytes) => {
   if (bytes === 0) return '/';
@@ -129,19 +142,9 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
   }, [parent, type]);
 
   useEffect(() => {
-    if (type !== 'shared' && type !== 'trash') {
-      dispatch(getListDatas(type, users, ''));
-      dispatch(updateParent(''));
-      updateListBreadcrumb();
-    } else {
-      if (type === 'shared') {
-        console.log('lo~ shared');
-        // column
-        // data
-      } else {
-        console.log('lo~ trash');
-      }
-    }
+    dispatch(getListDatas(type, users, ''));
+    dispatch(updateParent(''));
+    updateListBreadcrumb();
 
   }, [type]);
   const EditableCell = ({
@@ -221,6 +224,11 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
     setFilteredInfo(null);
     setSortedInfo(null);
   };
+  const handleRestore = (record) => {
+    dispatch(restoreItem([record.id], datas, users.username, users.token))
+  }
+  const [popoverVisible, setPopoverVisible] = useState(false);
+
   const columns = [
     {
       title: "Loại",
@@ -242,48 +250,66 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
       sortOrder: sortedInfo && (sortedInfo.field === 'name' && sortedInfo.order),
       ellipsis: true,
       render: (_, record) => (
-        <Tooltip placement="top" title={<span>{record.name}</span>}>
-          <span>{record.name}</span>
-        </Tooltip>
+        <div style={{ position: 'relative' }}>
+          <Popover
+            content={<SharedComponent />}
+            title="Chia sẻ với"
+            trigger="click"
+            placement="rightTop"
+          // visible={popoverVisible}
+          // onVisibleChange={visi => setPopoverVisible(visi)}
+          >
+            <TeamOutlined className="icon-shared" />
+          </Popover>
+
+          <Tooltip placement="top" title={<span>{record.name}</span>}>
+            <span>{record.name}</span>
+          </Tooltip>
+        </div>
       )
     },
     {
-      title: "Kích thước",
+      title: (<span>{type === 'trash' ? 'Nhóm' : "Kích thước"}</span>),
       dataIndex: "size",
-      render: (_, record) => renderSize(record.size),
+      render: (_, record) => type === 'trash' ? renderKind(record.parent) : renderSize(record.size),
     },
     {
-      title: "Sửa đổi lần cuối",
+      title: (<span>{type === 'trash' ? 'Ngày vào thùng rác' : "Sửa đổi lần cuối"}</span>),
       dataIndex: "modifyDate",
     },
     {
-      title: "Thao tác",
+      title: (<span>{type === 'trash' ? 'Khôi phục' : "Đổi tên"}</span>),
       dataIndex: "operation",
       render: (_, record) => {
-        return isEditing(record) ? (
-          <span>
-            <a
-              onClick={() => save(record)}
-              style={{
-                marginRight: 8,
-              }}
-            >
-              Lưu
+        return type === 'trash' ?
+          (<HistoryOutlined
+            onClick={() => handleRestore(record)}
+            style={{ fontSize: 18, paddingLeft: 20 }} />
+          )
+          : isEditing(record) ? (
+            <span>
+              <a
+                onClick={() => save(record)}
+                style={{
+                  marginRight: 8,
+                }}
+              >
+                Lưu
             </a>
-            <a onClick={cancel}>Hủy</a>
-          </span>
-        ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => edit(record)}
-          >
-            <EditFilled
-              style={{
-                fontSize: 18, paddingLeft: 20
-              }
-              } />
-          </Typography.Link>
-        );
+              <a onClick={cancel}>Hủy</a>
+            </span>
+          ) : (
+            <Typography.Link
+              disabled={editingKey !== ""}
+              onClick={() => edit(record)}
+            >
+              <EditFilled
+                style={{
+                  fontSize: 18, paddingLeft: 20
+                }
+                } />
+            </Typography.Link>
+          );
       },
     },
   ];
@@ -316,6 +342,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
     hideDefaultSelections: true,
   };
 
+  const URI = 'http://127.0.0.1:6969/';
   const handlePlay = (rc) => {
     const extension = rc.extension;
     const src = rc.file_sk + '.' + rc.extension;
@@ -323,17 +350,17 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
       const title = rc.name;
       if (extension === 'mp4') {
         setIsVideoPlaying(true);
-        setSrcVideo(src);
+        setSrcVideo(URI + 'Videos/' + src);
         setTitleVideo(title);
       } else { // mp3
         setIsVideoPlaying(false);
-        setSrcAudio(src);
+        setSrcAudio(URI + 'Musics/' + src);
         setTitleAudio(title);
         // console.log(src);
       }
       setVisible(true);
     } else {
-      setSrcImage(src);
+      setSrcImage(URI + 'Pictures/' + src);
       setPreview(true);
     }
 
@@ -371,22 +398,15 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
   return (
     <div >
       <Image
-       placeholder={
-        <Image
-          preview={false}
-          src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png?x-oss-process=image/blur,r_50,s_50/quality,q_1/resize,m_mfit,h_200,w_200"
-          width={0}
-        />
-      }
         preview={{
           visible: preview,
           onVisibleChange: () => { setPreview(false); setSrcImage('') },
-          src: `http://127.0.0.1:6969/Pictures/${srcImage}`,
+          src: srcImage,
         }}
       />
       <Modal
         className='model-custom'
-        title={titleVideo}
+        title={isVideoPlaying ? titleVideo : titleAudio}
         centered
         visible={visible}
         onCancel={() => { handleCancel() }}
@@ -395,7 +415,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
         {isVideoPlaying ?
           <ReactPlayer
             height='fit-content'
-            url={`http://127.0.0.1:6969/Videos/${srcVideo}`}
+            url={srcVideo}
             // loop
             stopOnUnmount={true}
             playing={true}
@@ -404,7 +424,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
             muted={true}
           /> :
           <div style={{ width: 500 }}>
-            <h5>{titleAudio}</h5>
+            {/* <h5>{titleAudio}</h5> */}
             <div style={{ display: 'flex', justifyContent: 'center', padding: '15px 0' }}>
               <img id='img-audio' src={MusicMainIcon} alt="" width='150' height='150' />
             </div>
@@ -413,7 +433,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
               autoPlay
               onPause={() => { handlePauseAudio('paused'); }}
               onPlay={() => { handlePauseAudio('running') }}
-              src={'http://127.0.0.1:6969/Musics/' + srcAudio}
+              src={srcAudio}
             />
           </div>
 
@@ -433,7 +453,7 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
         dataSource={datas}
         rowKey="id"
         onRow={(record, _) => {
-          return {
+          return type !== 'trash' && {
             onDoubleClick: () => {
               if (record.extension === 'FOLDER') {
                 dispatch(updateParent(record.name));
