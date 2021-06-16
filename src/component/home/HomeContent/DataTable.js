@@ -2,19 +2,20 @@ import { EditFilled, HistoryOutlined, TeamOutlined } from '@ant-design/icons';
 import { Form, Image, Input, message, Popover, Table, Tooltip, Typography } from "antd";
 import Modal from 'antd/lib/modal/Modal';
 import React, { useEffect, useState } from "react";
+import { useRef } from 'react';
 import AudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 import ReactPlayer from 'react-player';
 import { useDispatch, useSelector } from "react-redux";
-import { editFileName, getListDatas, getUsedMemory, restoreItem, updateParent } from "../../../actions/rootAction";
+import { editFileName, getListDatas, getListSharedOwner, getUsedMemory, restoreItem, updateParent } from "../../../actions/rootAction";
 import FolderIcon from "../../../images/folder.png";
 import JpgIcon from "../../../images/jpg.svg";
 import Mp3Icon from "../../../images/mp3.png";
 import Mp4Icon from "../../../images/mp4.png";
-import MusicMainIcon from "../../../images/music-main.png";
-import PictureMainIcon from "../../../images/picture.png";
 import PngIcon from "../../../images/png.svg";
 import SvgIcon from "../../../images/svg.svg";
+import MusicMainIcon from "../../../images/music-main.png";
+import PictureMainIcon from "../../../images/picture.png";
 import VideoMainIcon from "../../../images/video-main.png";
 import SharedComponent from './SharedComponent';
 
@@ -95,25 +96,28 @@ const videoFilter = [
     value: 'mp4',
   },
 ]
-const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giveListRowKeys }) => {
+const filterDataShared = (id, datas) => {
+  return datas.filter(f => f.file_id === id);
+}
+const DataTable = ({ sendListRowKeys, updateListBreadcrumb, giveListRowKeys }) => {
   const [selectedRowKeys, setSelectedRowked] = useState([]);
   const [editingKey, setEditingKey] = useState("");
 
   const listDatas = useSelector((state) => state.file);
-  var { datas } = listDatas;
+  let { datas } = listDatas;
 
   const currentType = useSelector((state) => state.fileType);
-  var { type } = currentType;
+  let { type } = currentType;
 
   const currenParent = useSelector((state) => state.parent);
-  var { parent } = currenParent;
+  let { parent } = currenParent;
 
   //
   const [visible, setVisible] = useState(false);
   //
 
   const dataUsers = useSelector((state) => state.auth);
-  var { users } = dataUsers;
+  let { users } = dataUsers;
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     dispatch(getUsedMemory(users.username, users.token));
@@ -130,9 +134,23 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
     setSelectedRowked(giveListRowKeys);
   }, [giveListRowKeys]);
 
+  // const [recordHis, setRecordHis] = useState(null);
+  const recordHis = useRef(null);
   useEffect(() => {
-    dispatch(getListDatas(type, users, parent));
+    if (type === 'shared') {
+      // dispatch(getListDatas(type, users, parent));
+      if (recordHis.current) {
+        dispatch(getListDatas(recordHis.current.kind, { username: recordHis.current.owner, token: users.token }, parent, 1, true));
+      }
+    }
+    else
+      dispatch(getListDatas(type, users, parent));
   }, [parent]);
+
+  // useEffect(() => {
+  //   if (record)
+
+  // }, [record])
 
   useEffect(() => {
     sendListRowKeys([]);
@@ -145,8 +163,20 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
     dispatch(getListDatas(type, users, ''));
     dispatch(updateParent(''));
     updateListBreadcrumb();
-
+    if (type !== 'trash' && type !== 'shared')
+      getListSharedOwner(type, users)
+        .then(res => {
+          let sharedIdsTmp = [];
+          res.map(s => {
+            if (!sharedIdsTmp.includes(s.file_id))
+              sharedIdsTmp.push(s.file_id);
+          });
+          setSharedIds(sharedIdsTmp);
+          setSharedDatas(res);
+        })
   }, [type]);
+  const [sharedIds, setSharedIds] = useState([]);
+  const [sharedDatas, setSharedDatas] = useState([]);
   const EditableCell = ({
     editing,
     dataIndex,
@@ -227,8 +257,6 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
   const handleRestore = (record) => {
     dispatch(restoreItem([record.id], datas, users.username, users.token))
   }
-  const [popoverVisible, setPopoverVisible] = useState(false);
-
   const columns = [
     {
       title: "Loại",
@@ -251,17 +279,20 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
       ellipsis: true,
       render: (_, record) => (
         <div style={{ position: 'relative' }}>
-          <Popover
-            content={<SharedComponent />}
-            title="Chia sẻ với"
-            trigger="click"
-            placement="rightTop"
-          // visible={popoverVisible}
-          // onVisibleChange={visi => setPopoverVisible(visi)}
-          >
-            <TeamOutlined className="icon-shared" />
-          </Popover>
-
+          {sharedIds.includes(record.id) &&
+            <Popover
+              content={<SharedComponent
+                datas={filterDataShared(record.id, sharedDatas)}
+                type={type}
+                token={users.token}
+              />}
+              title="Chia sẻ với"
+              trigger="click"
+              placement="rightTop"
+            >
+              <TeamOutlined className="icon-shared" />
+            </Popover>
+          }
           <Tooltip placement="top" title={<span>{record.name}</span>}>
             <span>{record.name}</span>
           </Tooltip>
@@ -274,11 +305,11 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
       render: (_, record) => type === 'trash' ? renderKind(record.parent) : renderSize(record.size),
     },
     {
-      title: (<span>{type === 'trash' ? 'Ngày vào thùng rác' : "Sửa đổi lần cuối"}</span>),
-      dataIndex: "modifyDate",
+      title: (<span>{type === 'trash' ? 'Ngày vào thùng rác' : type === 'shared' ? "Chủ sở hữu" : "Sửa đổi lần cuối"}</span>),
+      dataIndex: type !== 'shared' ? "modifyDate" : "owner",
     },
     {
-      title: (<span>{type === 'trash' ? 'Khôi phục' : "Đổi tên"}</span>),
+      title: (<span>{type === 'trash' ? 'Khôi phục' : type === 'shared' ? "Nhóm" : "Đổi tên"}</span>),
       dataIndex: "operation",
       render: (_, record) => {
         return type === 'trash' ?
@@ -286,30 +317,32 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
             onClick={() => handleRestore(record)}
             style={{ fontSize: 18, paddingLeft: 20 }} />
           )
-          : isEditing(record) ? (
-            <span>
-              <a
-                onClick={() => save(record)}
-                style={{
-                  marginRight: 8,
-                }}
-              >
-                Lưu
+          : type === 'shared' ?
+            renderKind(record.kind)
+            : isEditing(record) ? (
+              <span>
+                <a
+                  onClick={() => save(record)}
+                  style={{
+                    marginRight: 8,
+                  }}
+                >
+                  Lưu
             </a>
-              <a onClick={cancel}>Hủy</a>
-            </span>
-          ) : (
-            <Typography.Link
-              disabled={editingKey !== ""}
-              onClick={() => edit(record)}
-            >
-              <EditFilled
-                style={{
-                  fontSize: 18, paddingLeft: 20
-                }
-                } />
-            </Typography.Link>
-          );
+                <a onClick={cancel}>Hủy</a>
+              </span>
+            ) : (
+              <Typography.Link
+                disabled={editingKey !== ""}
+                onClick={() => edit(record)}
+              >
+                <EditFilled
+                  style={{
+                    fontSize: 18, paddingLeft: 20
+                  }
+                  } />
+              </Typography.Link>
+            );
       },
     },
   ];
@@ -330,9 +363,9 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
     };
   });
 
-  const onSelectChange = (selectedRowKeys, record) => {
+  const onSelectChange = (selectedRowKeys) => {
     setSelectedRowked(selectedRowKeys);
-    sendListRecords(record);
+    // sendListRecords(record);
     sendListRowKeys(selectedRowKeys);
   };
 
@@ -378,13 +411,13 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
   const handleCancel = () => {
     setVisible(false);
     if (isVideoPlaying) {
-      var videoElement = document.getElementsByTagName('video');
+      let videoElement = document.getElementsByTagName('video');
       videoElement[0].pause();
       videoElement[0].src = '';
       videoElement[0].load();
       setSrcVideo('');
     } else {
-      var videoElement = document.getElementsByTagName('audio');
+      let videoElement = document.getElementsByTagName('audio');
       videoElement[0].pause();
       videoElement[0].src = '';
       videoElement[0].load();
@@ -424,7 +457,6 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
             muted={true}
           /> :
           <div style={{ width: 500 }}>
-            {/* <h5>{titleAudio}</h5> */}
             <div style={{ display: 'flex', justifyContent: 'center', padding: '15px 0' }}>
               <img id='img-audio' src={MusicMainIcon} alt="" width='150' height='150' />
             </div>
@@ -457,7 +489,13 @@ const DataTable = ({ sendListRowKeys, sendListRecords, updateListBreadcrumb, giv
             onDoubleClick: () => {
               if (record.extension === 'FOLDER') {
                 dispatch(updateParent(record.name));
-                updateListBreadcrumb(record.name)
+                updateListBreadcrumb(record.name);
+                if (type === 'shared') {
+                  recordHis.current = {
+                    kind: record.kind,
+                    owner: record.owner,
+                  }
+                }
               } else {
                 handlePlay(record);
               }

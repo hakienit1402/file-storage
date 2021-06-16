@@ -69,7 +69,7 @@ body{
   .icon-shared{
     /* display: block; */
     position: absolute;
-    color: #b70818c2 !important;
+    color: #649294d9 !important;
     font-size: 18px;
     left: -17px;
     top: -10px;
@@ -84,8 +84,33 @@ body{
   .list-shared .delete-shared{
     cursor: pointer;
   }
-  .list-shared .delete-shared:hover,.delete-shared:hover .title-shared {
+  .list-shared .delete-shared:hover {
     color: #bd2214;
     transition: 0.2s ease-in;
   }
   /* title-shared */
+  .search-ngoc input{
+    border-radius: 0;
+    border: 1px solid #a7a7a7c4;
+  }
+  .search-ngoc input:hover,.search-ngoc input:focus{
+    border: 1px solid #4d4d4dc4 !important;
+  }
+  .search-ngoc button{
+    background-color: #535353;
+    border: none;
+    width: 80px;
+  }
+  .search-ngoc button:hover{
+    background-color: #252525;
+  }
+  .search-ngoc .anticon-search{
+    font-size: 20px;
+  }
+.ant-collapse-header{
+  padding-left: 0 !important;
+  width: fit-content !important;
+}
+.ant-collapse-content-box{
+  padding: 0 !important;
+}

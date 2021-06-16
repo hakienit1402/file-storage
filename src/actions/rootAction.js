@@ -17,25 +17,149 @@ export const updateParent = (parent) => (dispatch) => {
 }
 
 const HEAD_URI = "http://localhost:8080/api/user";
+
+export const moveFiles = (keys = [], type = '', new_parent = '', token = '') => {
+    let data = keys.map(e => {
+        return {
+            id: e
+        }
+    })
+    let config = {
+        method: 'put',
+        url: `${HEAD_URI}/${type}/move`,
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        data: {
+            new_parent,
+            datas: data
+        }
+    }
+    return new Promise((resolve, reject) => {
+        try {
+            axios(config)
+                .then(() => resolve())
+                .catch(() => reject())
+        } catch (err) {
+            console.log(err);
+            reject();
+        }
+    });
+}
+
+export const getListSearch = async (creator, token, query) => {
+    let config = {
+        method: 'get',
+        url: `${HEAD_URI}/search/${creator}/${query}`,
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    };
+    try {
+        const res = await axios(config);
+        return res;
+    } catch (e) {
+        console.log(e);
+        return [];
+    }
+}
+export const getListSharedOwner = async (type, user) => {
+    let config = {
+        method: 'get',
+        url: `${HEAD_URI}/shared/${type}/owner/${user.username}`,
+        headers: {
+            'Authorization': `Bearer ${user.token}`
+        }
+    };
+    try {
+        const data = await axios(config)
+        return data.data;
+    } catch (err) {
+        console.log(err);
+        return [];
+    }
+}
+export const deleteSharedById = async (id, type, token) => {
+    let config = {
+        method: 'post',
+        url: `${HEAD_URI}/shared/${type}/delete`,
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        data: id
+    };
+    try {
+        const res = await axios(config);
+        return res;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+}
+export const addReceiver = async (type, user, receivers, file_ids) => {
+    let config = {
+        method: 'post',
+        url: `${HEAD_URI}/shared/${type}`,
+        headers: {
+            'Authorization': `Bearer ${user.token}`,
+            'Content-Type': 'application/json'
+        },
+        data: {
+            owner: user.username,
+            receivers: receivers,
+            file_ids: file_ids
+        }
+    };
+    try {
+        const res = await axios(config);
+        return res;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+
+}
+export const findUser = async (text, token) => {
+    let config = {
+        method: 'get',
+        url: `${HEAD_URI}/shared/${text}`,
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    };
+    try {
+        const data = await axios(config);
+        return data;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+}
 // type: musics, pictures, videos
-export const getListDatas = (typeFile, data, parent, state = 1) => (dispatch) => {
-    // console.log('state', state);
-    let url = typeFile !== 'trash' ? `${HEAD_URI}/${typeFile}/${state}/${data.username}/${parent}`
-        : `${HEAD_URI}/${typeFile}/${data.username}`;
+export const getListDatas = (typeFile, user, parent, state = 1, shared) => (dispatch) => {
+    let url;
+    if (!shared) {
+        url = typeFile === 'trash' ? `${HEAD_URI}/${typeFile}/${user.username}`
+            : typeFile === 'shared' ? `${HEAD_URI}/${typeFile}/all/${user.username}` : `${HEAD_URI}/${typeFile}/${state}/${user.username}/${parent}`;
+    } else {
+        url = `${HEAD_URI}/${typeFile}/shared/${user.username}/${parent}`;
+    }
     try {
         dispatch({ type: GET_LIST });
         let config = {
             method: 'get',
-            // url: `${HEAD_URI}/${typeFile}/${state}/${data.username}/${parent}`,
             url: url,
             headers: {
-                'Authorization': `Bearer ${data.token}`
+                'Authorization': `Bearer ${user.token}`
             }
         };
         axios(config)
             .then((res) => {
                 var data = res.data;
-                data.sort((a, b) => { return new Date(b.modifyDate) - new Date(a.modifyDate) });
+                if (typeFile !== 'shared')
+                    data.sort((a, b) => { return new Date(b.modifyDate) - new Date(a.modifyDate) });
                 dispatch({ type: GET_LIST_SUCCESS, payload: data });
             }).catch(() => {
                 dispatch({ type: LOGOUT });
@@ -66,10 +190,6 @@ export const editFileName = (datas, new_name, index, typeFile, token) => (dispat
         extension: datas[index].extension,
         creator: datas[index].creator
     }
-    // id, new_name,old_name,extension,creator
-
-    // dispatch({ type: POST_EDIT_MUSIC });
-
     let config = {
         method: 'put',
         url: `${HEAD_URI}/${typeFile}/name`,
@@ -82,8 +202,8 @@ export const editFileName = (datas, new_name, index, typeFile, token) => (dispat
 
     axios(config)
         .then(function () {
+            dataAlterUpdate.sort((a, b) => { return new Date(b.modifyDate) - new Date(a.modifyDate) });
             dispatch({ type: UPDATE_STORE_TMP, payload: dataAlterUpdate });
-            // console.log(JSON.stringify(response.data));
         })
         .catch(function () {
             dispatch({ type: UPDATE_STORE_TMP, payload: datas });
@@ -164,15 +284,11 @@ export const restoreItem = (listId, listDatas, creator, token) => (dispatch) => 
             axios({ ...config, url: `${HEAD_URI}/musics/trash`, data: { ...dataRequest, datas: dataMusics } });
 
         const list = listDatas.filter(f => !listId.includes(f.id));
-        // console.log(list);
         dispatch({ type: GET_LIST_SUCCESS, payload: list });
 
     } catch (err) { console.log(err); }
-    // console.log(dataPictures, 'pic');
-    // console.log(dataVideos, 'video');
-    // console.log(dataMusics, 'music');
 }
-//
+
 export const getUsedMemory = (creator, token) => (dispatch) => {
     var config = {
         method: 'get',

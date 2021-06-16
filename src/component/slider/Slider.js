@@ -24,10 +24,8 @@ const Slider = ({ type }) => {
 	const [currentType, setCurrentType] = useState(type || 'pictures');
 	const dispatch = useDispatch();
 	const handleItemClick = e => {
-		// clickHandler(e.key);
 		dispatch(updateType(e.key));
 		setCurrentType(e.key);
-		// console.log(e.key);
 	}
 
 	const formatBytes = (bytes) => {

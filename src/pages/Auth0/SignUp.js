@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
+import { uuidv4 } from '../../actions/authAction';
 import '../../fonts/font_awesome/css/all.css';
 import avatar from '../../images/auth/avatar.svg';
 import bg from '../../images/auth/bg.svg';
@@ -8,16 +9,7 @@ import wave from '../../images/auth/wave.png';
 import './style.css';
 
 const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-function uuidv4() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-            var r = (Math.random() * 16) | 0,
-                v = c == "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        }
-    );
-}
+
 var uuidRandom = '';
 function SignUp() {
     const [eventU, setU] = useState(false);
@@ -30,13 +22,11 @@ function SignUp() {
     const [cpassword, setCPassword] = useState('');
     const [email, setEmail] = useState('');
 
-    // const [uuid, setUuid] = useState(uuidv4());
-
     const [otp, setOtp] = useState('');
     const [msgValid, setMsgValid] = useState('');
     const [isClick, setClick] = useState(false);
     function onchangeVipPro(e) {
-        console.log(e.target.value);
+        // console.log(e.target.value);
         setOtp(e.target.value);
     }
     const history = useHistory();

@@ -1,5 +1,5 @@
 import { Layout } from 'antd';
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { Route, Switch } from 'react-router';
 import Header from '../../component/header/Header';
@@ -11,17 +11,19 @@ const { Sider } = Layout;
 
 const MainPage = () => {
 	const currentType = useSelector((state) => state.fileType);
-	var { type } = currentType;
+	let { type } = currentType;
+
+	const dataUsers = useSelector((state) => state.auth);
+	let { users } = dataUsers;
 
 	return (
 		<div>
-			<Header />
+			<Header user={users}/>
 			<Layout>
 				<Layout>
 					<Sider width={250} style={{ background: '#fff' }}>
-						<Slider 
-						// clickHandler={clickHandler} 
-						type={type||'pictures'} />
+						<Slider
+							type={type || 'pictures'} />
 					</Sider>
 					<Layout
 						style={{

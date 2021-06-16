@@ -7,15 +7,15 @@ import NavigationTab from "./NavigationTab";
 const HomeContent = () => {
 
   const [listRowKeys, setListRowKeys] = useState([]);
-  const [listRecord, setListRecord] = useState([]);
+  // const [listRecord, setListRecord] = useState([]);
   const [listBreadcrumb, setListBreadcrumb] = useState([''])
   const dispatch = useDispatch();
   const sendListRowKeys = (listkeys) => {
     setListRowKeys(listkeys)
   }
-  const sendListRecords = (listRecords) => {
-    setListRecord(listRecords)
-  }
+  // const sendListRecords = (listRecords) => {
+  //   setListRecord(listRecords)
+  // }
   const updateListBreadcrumb = (name) => {
     if (name)
       setListBreadcrumb([...listBreadcrumb, name]);
@@ -47,7 +47,7 @@ const HomeContent = () => {
       <div>
         <DataTable
           sendListRowKeys={sendListRowKeys}
-          sendListRecords={sendListRecords}
+          // sendListRecords={sendListRecords}
           updateListBreadcrumb={updateListBreadcrumb}
           giveListRowKeys={giveListKey}
         />
