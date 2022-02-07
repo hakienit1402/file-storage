@@ -42,7 +42,7 @@ const AvatarGroup = () => {
 		<div className="avatar-group-notifi-detail">
 			<Menu>
 				<Menu.Item key="0">
-					<div>Chào Cô! </div>
+					<div>Chào! </div>
 				</Menu.Item>
 				<Menu.Item key="1">
 					<div>Thông báo mới!!</div>
