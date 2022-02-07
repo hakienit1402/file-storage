@@ -157,7 +157,9 @@ export const getListDatas = (typeFile, user, parent, state = 1, shared) => (disp
         };
         axios(config)
             .then((res) => {
-                var data = res.data;
+                let data = res.data;
+                if (typeFile === 'trash')
+                    data = transformDataTrash(data);
                 if (typeFile !== 'shared')
                     data.sort((a, b) => { return new Date(b.modifyDate) - new Date(a.modifyDate) });
                 dispatch({ type: GET_LIST_SUCCESS, payload: data });
@@ -211,7 +213,7 @@ export const editFileName = (datas, new_name, index, typeFile, token) => (dispat
         });
 };
 export const moveToTrash = (listIds, listDatas, creator, token, type) => (dispatch) => {
-    var datas = listDatas.filter(f => listIds.includes(f.id)).map(f => {
+    let datas = listDatas.filter(f => listIds.includes(f.id)).map(f => {
         return {
             id: f.id,
             name: f.name,
@@ -246,21 +248,22 @@ export const moveToTrash = (listIds, listDatas, creator, token, type) => (dispat
 
 };
 
-export const restoreItem = (listId, listDatas, creator, token) => (dispatch) => {
+export const restoreItem = (listId = [], listDatas = [], creator, token) => (dispatch) => {
     let dataPictures = [];
     let dataVideos = [];
     let dataMusics = [];
+    const formatId = id => parseInt(id.substring(0, id.indexOf('##')));
     // lọc ra theo nhóm: videos, musics, pictures
+
     listDatas.filter(f => listId.includes(f.id))
         .map(f => {
             if (f.parent === 'videos')
-                dataVideos.push({ id: f.id, name: f.name, extension: f.extension })
+                dataVideos.push({ id: formatId(f.id), name: f.name, extension: f.extension })
             else if (f.parent === 'pictures')
-                dataPictures.push({ id: f.id, name: f.name, extension: f.extension })
+                dataPictures.push({ id: formatId(f.id), name: f.name, extension: f.extension })
             else
-                dataMusics.push({ id: f.id, name: f.name, extension: f.extension })
+                dataMusics.push({ id: formatId(f.id), name: f.name, extension: f.extension })
         });
-
     const dataRequest = {
         creator: creator,
         state: 1,
@@ -289,8 +292,51 @@ export const restoreItem = (listId, listDatas, creator, token) => (dispatch) => 
     } catch (err) { console.log(err); }
 }
 
+export const deleteItem = (listId = [], listDatas = [], creator, token) => (dispatch) => {
+    let dataPictures = [];
+    let dataVideos = [];
+    let dataMusics = [];
+    const formatId = id => parseInt(id.substring(0, id.indexOf('##')));
+    // lọc ra theo nhóm: videos, musics, pictures
+    listDatas.filter(f => listId.includes(f.id))
+        .map(f => {
+            if (f.parent === 'videos')
+                dataVideos.push({ id: formatId(f.id), name: f.name, extension: f.extension })
+            else if (f.parent === 'pictures')
+                dataPictures.push({ id: formatId(f.id), name: f.name, extension: f.extension })
+            else
+                dataMusics.push({ id: formatId(f.id), name: f.name, extension: f.extension })
+        });
+    const dataRequest = {
+        creator: creator,
+        datas: null
+    }
+    const config = {
+        method: 'post',
+        url: null,
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        data: null
+    }
+    try {
+        if (dataPictures.length !== 0)
+            axios({ ...config, url: `${HEAD_URI}/pictures/delete`, data: { ...dataRequest, datas: dataPictures } });
+        if (dataVideos.length !== 0) {
+            axios({ ...config, url: `${HEAD_URI}/videos/delete`, data: { ...dataRequest, datas: dataVideos } });
+        }
+        if (dataMusics.length !== 0)
+            axios({ ...config, url: `${HEAD_URI}/musics/delete`, data: { ...dataRequest, datas: dataMusics } });
+
+        const list = listDatas.filter(f => !listId.includes(f.id));
+        dispatch({ type: GET_LIST_SUCCESS, payload: list });
+
+    } catch (err) { console.log(err); }
+}
+
 export const getUsedMemory = (creator, token) => (dispatch) => {
-    var config = {
+    let config = {
         method: 'get',
         url: `${HEAD_URI}/${creator}`,
         headers: {
@@ -316,5 +362,8 @@ export const getUsedMemory = (creator, token) => (dispatch) => {
 //     const i = Math.floor(Math.log(bytes) / Math.log(k));
 //     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 // }
+const transformDataTrash = (datas = []) => {
+    return datas.map(v => { return { ...v, id: `${v.id}##${v.parent}` } })
+}
 
 

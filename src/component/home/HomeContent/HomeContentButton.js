@@ -5,11 +5,11 @@ import {
 	UserAddOutlined
 } from '@ant-design/icons';
 import { HistoryOutlined } from '@material-ui/icons';
-import { Button, message, Modal, notification } from 'antd';
+import { Button, message, Modal, notification, Popconfirm } from 'antd';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addReceiver, getListDatas, moveFiles, moveToTrash, restoreItem } from '../../../actions/rootAction';
+import { addReceiver, deleteItem, getListDatas, moveFiles, moveToTrash, restoreItem } from '../../../actions/rootAction';
 import MentionsComponent from './MentionsComponent';
 import TreeSelectCustom from './TreeSelectCustom';
 // const { Header, Sider } = Layout;
@@ -194,7 +194,8 @@ const HomeContentButton = ({ listRowKeys, setGiveListKey }) => {
 		ref.current = adu;
 	}
 	const handleDeleteVV = () => {
-
+		dispatch(deleteItem(keys, datas, users.username, users.token));
+		message.success('Xóa thành công');
 	}
 	const handleRestore = () => {
 		dispatch(restoreItem(listRowKeys, datas, users.username, users.token))
@@ -248,15 +249,22 @@ const HomeContentButton = ({ listRowKeys, setGiveListKey }) => {
 				type="default" size="large" style={{ marginRight: '1rem' }}>
 				Khôi phục
 			</Button>
-			<Button disabled={keys.length === 0}
-				type="default"
-				size="large"
-				style={{ marginRight: '1rem' }}
-				onClick={() => { handleDeleteVV() }}
+			<Popconfirm
+				title='Xóa sẽ không thể khôi phục!'
+				onConfirm={handleDeleteVV}
+				okText="Đồng ý"
+				cancelText="Hủy"
 			>
-				<CloseCircleFilled />
-				Xóa vĩnh viễn
-			</Button>
+				<Button disabled={keys.length === 0}
+					type="default"
+					size="large"
+					style={{ marginRight: '1rem' }}
+				>
+					<CloseCircleFilled />
+					Xóa vĩnh viễn
+				</Button>
+			</Popconfirm>,
+
 		</div>)
 		: type === 'shared' ?
 			(<div style={{ marginBottom: 10, display: 'flex', alignItems: 'center' }}>

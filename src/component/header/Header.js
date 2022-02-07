@@ -7,7 +7,7 @@ import logo from "../../images/cloudy.svg";
 import AvatarGroup from "./avatar/AvatarGroup";
 import "./HeaderStyle.css";
 import SearchInput from "./searchBar/SearchInput";
-const Header = ({ user }) => {
+const Header = () => {
   const dispatch = useDispatch();
   return (
     <>
@@ -38,7 +38,7 @@ const Header = ({ user }) => {
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}
           span={5}
         >
-          <AvatarGroup user={user} />
+          <AvatarGroup />
         </Col>
       </Row>
     </>

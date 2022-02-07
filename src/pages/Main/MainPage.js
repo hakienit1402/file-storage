@@ -13,12 +13,9 @@ const MainPage = () => {
 	const currentType = useSelector((state) => state.fileType);
 	let { type } = currentType;
 
-	const dataUsers = useSelector((state) => state.auth);
-	let { users } = dataUsers;
-
 	return (
 		<div>
-			<Header user={users}/>
+			<Header/>
 			<Layout>
 				<Layout>
 					<Sider width={250} style={{ background: '#fff' }}>

@@ -99,6 +99,7 @@ const videoFilter = [
 const filterDataShared = (id, datas) => {
   return datas.filter(f => f.file_id === id);
 }
+
 const DataTable = ({ sendListRowKeys, updateListBreadcrumb, giveListRowKeys }) => {
   const [selectedRowKeys, setSelectedRowked] = useState([]);
   const [editingKey, setEditingKey] = useState("");
@@ -134,11 +135,9 @@ const DataTable = ({ sendListRowKeys, updateListBreadcrumb, giveListRowKeys }) =
     setSelectedRowked(giveListRowKeys);
   }, [giveListRowKeys]);
 
-  // const [recordHis, setRecordHis] = useState(null);
   const recordHis = useRef(null);
   useEffect(() => {
     if (type === 'shared') {
-      // dispatch(getListDatas(type, users, parent));
       if (recordHis.current) {
         dispatch(getListDatas(recordHis.current.kind, { username: recordHis.current.owner, token: users.token }, parent, 1, true));
       }
@@ -147,10 +146,6 @@ const DataTable = ({ sendListRowKeys, updateListBreadcrumb, giveListRowKeys }) =
       dispatch(getListDatas(type, users, parent));
   }, [parent]);
 
-  // useEffect(() => {
-  //   if (record)
-
-  // }, [record])
 
   useEffect(() => {
     sendListRowKeys([]);
@@ -328,7 +323,7 @@ const DataTable = ({ sendListRowKeys, updateListBreadcrumb, giveListRowKeys }) =
                   }}
                 >
                   Lưu
-            </a>
+                </a>
                 <a onClick={cancel}>Hủy</a>
               </span>
             ) : (

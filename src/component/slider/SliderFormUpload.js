@@ -11,6 +11,7 @@ import UploadIcon from "../../images/upload.png";
 const pictureAccept = ".png, .jpeg, .jpg, .svg";
 const videoAccept = ".mp4";
 const audioAccept = ".mp3";
+let a = false;
 const SliderFormUpload = () => {
 	const [visible, setVisible] = useState(false);
 	const [value, setValue] = useState('');
@@ -23,6 +24,9 @@ const SliderFormUpload = () => {
 
 	const currenParent = useSelector((state) => state.parent);
 	const { parent } = currenParent;
+
+	const usedMemory = useSelector((state) => state.memory);
+	var { memory } = usedMemory;
 
 	const showModal = () => {
 		setVisible(true);
@@ -88,6 +92,7 @@ const SliderFormUpload = () => {
 			duration: null
 		});
 	};
+
 	const dispatch = useDispatch();
 	const timeOut = useRef(null);
 	const props = {
@@ -96,13 +101,34 @@ const SliderFormUpload = () => {
 		headers: {
 			'Authorization': `Bearer ${users.token}`
 		},
+		beforeUpload(_, file_list) {
+			// console.log('total', memory);
+			let size_upload = file_list.reduce((sum, file) => {
+				return sum + file.size;
+			}, 0)
+			let size_uploaded = size_upload + memory;
+			let size_valid = users.acc_pkg_size;
+			if (size_valid < size_uploaded) {
+				if (!a) {
+					Modal.warning({
+						title: 'Cảnh báo',
+						content: 'Dung lượng tải lên vượt quá bộ nhớ cho phép.\nĐể tiếp tục tải lên vui lòng nâng cấp tài khoản của bạn!',
+						okText: 'Đóng',
+						onOk: () => {a = false },
+						onCancel: () => {a = false },
+					});
+					a = true;
+				}
+				return false;
+			}
+			return true;
+		},
 		onChange(info) {
 			if (info.file.status === 'done') {
 				console.log("ok");
 			}
 		},
 		onStart: ({ uid, name }) => {
-			// console.log(name);
 			openNotification(name, 0, uid);
 		},
 		onSuccess: (_, { uid }) => {
@@ -131,7 +157,7 @@ const SliderFormUpload = () => {
 					showUploadList={false}
 				>
 					<Button
-					disabled={type === 'trash'}
+						disabled={type === 'trash'}
 						className='btn-up-new'
 						variant="contained"
 						startIcon={

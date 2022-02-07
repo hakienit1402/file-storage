@@ -14,7 +14,6 @@ import { Link } from 'react-router-dom';
 import { updateType } from '../../actions/rootAction';
 import SliderFormUpload from './SliderFormUpload';
 const Slider = ({ type }) => {
-	// const Slider = ({ clickHandler, type }) => {
 	const dataUsers = useSelector((state) => state.auth);
 	var { users } = dataUsers;
 
@@ -33,7 +32,7 @@ const Slider = ({ type }) => {
 		const k = 1024;
 		const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
 		const i = Math.floor(Math.log(bytes) / Math.log(k));
-		return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 	}
 	return (
 		<div>
@@ -100,12 +99,13 @@ const Slider = ({ type }) => {
 							to: '#87d068',
 						}}
 						size="small"
-						percent={Math.round((memory / users.acc_pkg_size) * 100)}
+						// percent={Math.round((memory / users.acc_pkg_size) * 100)}
+						percent={Math.floor((memory / users.acc_pkg_size) * 100)}
 						status="active"
 					/>
 					<span
-						style={{ color: '#656565', fontSize: 12, marginBottom: 10, display: 'block' }}>
-						Đã sử dụng <b>{formatBytes(memory)}</b> trong tổng số <b>{formatBytes(users.acc_pkg_size)}</b>
+						style={{ color: '#656565', fontSize: 13, marginBottom: 10, display: 'block' }}>
+						Đã sử dụng <b>{formatBytes(memory)}</b> / <b>{formatBytes(users.acc_pkg_size)}</b>
 					</span>
 
 				</div>

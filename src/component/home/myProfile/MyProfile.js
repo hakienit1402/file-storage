@@ -28,7 +28,7 @@ function MyProfile({ user, visible, onCancel }) {
 						else if (newPwd.length < 8)
 							setNewPwdInValid('Mật khẩu ít nhất 8 ký tự');
 						else {
-							console.log(user.username == name, newPwd);
+							console.log(user.username, newPwd);
 							setNewPwdInValid(null);
 							setPwd(null)
 							setNewPwd(null)

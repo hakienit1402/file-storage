@@ -4,13 +4,17 @@ import {
 } from '@ant-design/icons';
 import { Button, Dropdown, Menu, Popover } from 'antd';
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import { logout } from '../../../actions/authAction';
 import MyProfile from '../../../component/home/myProfile/MyProfile';
 import './Style.css';
 
-const AvatarGroup = ({ user }) => {
+const AvatarGroup = () => {
+
+	const dataUsers = useSelector((state) => state.auth);
+	let { users } = dataUsers;
+
 	const dispatch = useDispatch();
 	const [visible, setVisible] = useState(false);
 	const his = useHistory();
@@ -54,7 +58,7 @@ const AvatarGroup = ({ user }) => {
 						Thông tin cá nhân
 					</Link>
 					<MyProfile
-					user={user}
+						user={users}
 						visible={visible}
 						onCancel={handleCancel}
 					/>
@@ -83,7 +87,7 @@ const AvatarGroup = ({ user }) => {
 		>
 			<div style={{ display: 'flex' }}>
 				<span style={{ fontStyle: 'italic' }}>Xin chào,</span>
-				<b style={{ marginRight: 10, marginLeft: 3 }}>{user.full_name}</b>
+				<b style={{ marginRight: 10, marginLeft: 3 }}>{users.full_name}</b>
 			</div>
 
 			<Dropdown

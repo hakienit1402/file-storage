@@ -91,6 +91,7 @@ export const checkPwd = async (password, username, token) => {
 
 
 export const sendMail = (email) => {
+    console.log(email);
     let config = {
         method: 'post',
         url: `${HEAD_URI}/mail`,
